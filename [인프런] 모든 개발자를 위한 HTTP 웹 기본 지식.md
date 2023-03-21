@@ -135,14 +135,17 @@
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/226267092-c05f45c1-9627-4791-b604-8ab0cdebbc8a.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/226267185-2da70e4f-d8fe-4ee2-8f69-f95a55a4126e.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/226267225-5976218a-c31b-4a41-ae2a-c082dc1f44a3.png">
+
 <br>
 
+
+  
 ## HTTP 기본
 ### 클라이언트 서버 구조
 ### Stateful, Stateless
 ### 비 연결성(connectionless)
 ### HTTP 메시지
-
+  
 ## HTTP 메서드
 ### HTTP 메서드 - GET, POST
 ### HTTP 메서드 - PUT, PATCH, DELETE
