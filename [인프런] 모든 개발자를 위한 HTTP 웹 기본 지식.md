@@ -151,4 +151,4 @@
 ### HTTP 메서드 - PUT, PATCH, DELETE
 ### HTTP 메서드의 속성
 
-
+## HTTP 메서드 활용 
