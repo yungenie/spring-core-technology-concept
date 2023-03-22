@@ -6,7 +6,10 @@
 ## 목차
 - [인터넷 네트워크](#인터넷-네트워크) 
 - [URL와 웹 브라우저 요청](#URL와-웹-브라우저-요청) 
-
+- [HTTP](#HTTP) 
+- [HTTP 메서드](#HTTP-메서드)  
+- [HTTP 메서드 활용](#HTTP-메서드-활용)  
+- [HTTP 상태코드](#HTTP-상태코드)   
 <br>
 
 ## 인터넷 네트워크
@@ -152,3 +155,63 @@
 ### HTTP 메서드의 속성
 
 ## HTTP 메서드 활용 
+
+## HTTP 상태코드
+### 상태코드 
+- 클라이언트가 **요청에 대한 처리상태**를 **응답**에서 알려주는 기능입니다.
+
+  - 1xx (Informational): 요청이 수신되어 처리중 (거의 사용하지 않음)
+  - 2xx (**Successful**): 요청 정상 처리
+  - 3xx (**Redirection**): 요청을 완료하려면 추가 행동이 필요
+  - 4xx (**Client Error**): 클라이언트 오류, 잘못된 문법등으로 서버가 요청을 수행할 수 없음
+  - 5xx (**Server Error**): 서버 오류, 서버가 정상 요청을 처리하지 못함
+
+### 2xx (Successful)
+- 클라이언트의 요청을 성공적으로 처리합니다.
+
+  - 200 OK : 요청 성공
+  - 201 Created : 요청 성공해서 새로운 리소스가 생성됨
+  - 202 Accepted : 요청이 **접수**되었으나 **처리가 완료되지 않았음.**
+  - 204 No Content : 서버가 요청을 성공적으로 수행했지만, 응답 페이로드 본문에 보낼 데이터가 없음.
+    ※ 페이로드(payload) : 사용에 있어서 전송되는 데이터 
+
+#### 201 Created
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/226808910-4073b0bf-283f-40cc-b22f-669530eedf11.png">
+
+### 3xx (Redirection)
+- 요청을 완료하기 위해 유저 에이전트(웹 브라우저)의 추가 조치 필요합니다.
+- 영구 리다이렉션, 일시 리다이렉션, 특수 리다이렉션(결과대신 캐시사용) 3가지 종류가 있습니다.
+
+  - 300 Multiple Choices : 안쓴다.
+  - 301 Moved Permanently : 요청 메서드가 GET으로 변하고, 본문이 제거될 수도 있음(MAY)
+  - **302 Found** : 요청 메서드가 GET으로 변하고, 본문이 제거될 수도 있음(MAY)
+  - 303 See Other : 요청 메서드가 GET으로 변경
+  - 304 Not Modified : 클라이언트 로컬 PC에 저장된 캐시를 사용합니다. (캐시로 리다이렉트)
+  - 307 Temporary Redirect : 요청 메서드와 본문 유지(POST메서드이면 리다이렉트도 POST유지)
+  - 308 Permanent Redirect : 요청 메서드와 본문 유지(POST메서드이면 리다이렉트도 POST유지)
+
+#### PRG:Post/Redirect/Get
+- 일시적인 리다이렉션으로 POST요청시 중복 방지를 위해 결과 화면을 GET메서드로 리다이렉트합니다.
+
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/226810931-b4e41364-5722-4f6a-889a-c08489ae66a2.png">
+
+#### 실무에서는 뭘 써야 하는 지?
+- 307,303을 권장하지만 현실적으로 이미 많은 애플리케이션 라이브러리들이 **302**를 기본값으로 사용합니다.
+- 처음 302 스펙의 의도는 HTTP 메서드를 유지였으나, 대부분 웹 브라우저들이 GET으로 일부는 다르게 동작.
+
+### 4xx (Client Error)
+- 클라이언트 오류
+  
+  - 400 Bad Request : 클라이언트의 잘못된 요청으로 서버가 요청 처리 불가
+  - 401 Unauthorized : 클라이언트가 해당 리소스에 대한 인증이 필요함
+    - 인증(Authentication): 본인이 누구인지 확인, (로그인)
+    - 인가(Authorization): 권한부여 (ADMIN 권한처럼 특정 리소스에 접근할 수 있는 권한, 인증이 있어야 인가가 있음)
+  - 403 Forbidden : 서버가 요청을 이해했지만 승인을 거부함 (인증 자격 증명은 있지만, 접근 권한 불충분)
+  - 404 Not Found : 요청 리소스를 찾을 수 없음
+
+### 5xx (Server Error)
+- 서버 오류
+  - 500 Internal Server Error : 서버 문제로 오류 발생
+  - 503 Service Unavailable : 서비스 이용 불가
+
+- 500에러는 심각한 에러로 웬만하면 500에러 처리를 만들면 안됩니다. 
