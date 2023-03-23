@@ -220,4 +220,37 @@
 ## HTTP 헤더2 - 캐시와 조건부 요청
 
 ### 캐시 무효화
+#### 캐시 무효화 하는 이유?
+- 중요한 데이터를 다루는 경우에는 캐시를 유지하면 안되기때문에 캐시를 무효화 시켜야 합니다. 
+- 캐시를 무효화 시키는 설정을 하는 이유는 캐시를 적용안해도 웹브라우저에서 GET 요청일 경우 임의로 캐시를 하는 경우가 있습니다.
+- 이러한 경우를 방지하기 위해서 명시적으로 캐시하지 않겠다고 표기하는 것 입니다.
+- 또한, 본인도 모르는 프록시 서버가 추가로 생길 수도 있기 때문에 옵션을 넣어두는 것이 좋습니다.
+
+#### 확실한 캐시 무효화 응답
+- 해당 호출을 캐시하면 안된다. 항상 새로운 호출을 하라
+
+	- Cache-Control: no-cache, no-store, must-revalidate
+	- Pragma: no-cache // HTTP 1.0 하위 호환
+
+
+ex) Java Servelt
+response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+response.setHeader("Expires", "0"); // Proxies.
+
+
+### 캐시 지시어
+- Cache-Control: no-cache
+	- 데이터는 캐시해도 되지만, 항상 원 서버에 검증하고 사용(이름에 주의!)
+
+- Cache-Control: no-store
+	- 데이터에 민감한 정보가 있으므로 저장하면 안됨(웹 브라우저 내부 메모리 공간에서 사용하고 최대한 빨리 삭제)
+
+- Cache-Control: must-revalidate
+	- 캐시 만료후 최초 조회시 원 서버에 검증해야함
+	- 원 서버 접근 실패시 반드시 오류가 발생해야함 - 504(Gateway Timeout)
+	- must-revalidate는 캐시 유효 시간이라면 캐시를 사용함
+
+- Pragma: no-cache
+	- HTTP 1.0 하위 호환
 
