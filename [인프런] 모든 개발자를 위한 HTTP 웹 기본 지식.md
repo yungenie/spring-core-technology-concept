@@ -239,7 +239,7 @@ response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
 response.setHeader("Expires", "0"); // Proxies.
 
 
-### 캐시 지시어
+#### 캐시 지시어
 - Cache-Control: no-cache
 	- 데이터는 캐시해도 되지만, 항상 원 서버에 검증하고 사용(이름에 주의!)
 
