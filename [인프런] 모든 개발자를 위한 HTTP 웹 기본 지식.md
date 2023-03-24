@@ -186,9 +186,9 @@
   - 301 Moved Permanently : 요청 메서드가 GET으로 변하고, 본문이 제거될 수도 있음(MAY)
   - **302 Found** : 요청 메서드가 GET으로 변하고, 본문이 제거될 수도 있음(MAY)
   - 303 See Other : 요청 메서드가 GET으로 변경
-  - 304 Not Modified : 클라이언트 로컬 PC에 저장된 캐시를 사용합니다. (캐시로 리다이렉트)
-  - 307 Temporary Redirect : 요청 메서드와 본문 유지(POST메서드이면 리다이렉트도 POST유지)
-  - 308 Permanent Redirect : 요청 메서드와 본문 유지(POST메서드이면 리다이렉트도 POST유지)
+  - 304 Not Modified : 캐시목적으로 사용. 변경된 것이 없음. 클라이언트 로컬 PC에 저장된 캐시를 사용합니다. (캐시로 리다이렉트)
+  - 307 Temporary Redirect : 리다이렉트시 요청 메서드와 본문 유지(요청 메서드를 변경하면 안된다. MUST NOT)
+  - 308 Permanent Redirect : 리다이렉트시 요청 메서드와 본문 유지(처음 POST를 보내면 리다이렉트도 POST 유지)
 
 #### PRG:Post/Redirect/Get
 - 일시적인 리다이렉션으로 POST요청시 중복 방지를 위해 결과 화면을 GET메서드로 리다이렉트합니다.
