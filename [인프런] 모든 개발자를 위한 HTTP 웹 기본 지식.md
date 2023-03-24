@@ -141,21 +141,6 @@
 
 <br>
 
-
-  
-## HTTP 기본
-### 클라이언트 서버 구조
-### Stateful, Stateless
-### 비 연결성(connectionless)
-### HTTP 메시지
-  
-## HTTP 메서드
-### HTTP 메서드 - GET, POST
-### HTTP 메서드 - PUT, PATCH, DELETE
-### HTTP 메서드의 속성
-
-## HTTP 메서드 활용 
-
 ## HTTP 상태코드
 ### 상태코드 
 - 클라이언트가 보낸 **요청에 대한 처리상태**를 **응답**에서 알려주는 기능입니다.
