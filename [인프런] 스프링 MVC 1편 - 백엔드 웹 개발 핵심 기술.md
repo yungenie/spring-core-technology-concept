@@ -90,3 +90,7 @@
 - 핵심
     - WAS가 멀티 쓰레드를 지원해줍니다.
     - 쓰레드 풀 설정 max thread로 처리를 할 수 있습니다. (개발자가 멀티 쓰레드 관련해서 코드로 신경을 쓰지 않아도 됩니다.)
+
+## 서블릿
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/229494672-c755ef01-ad7f-4187-a7a2-cd17d3f3df19.png">
+- 서블릿 클래스가 싱글톤으로 관리됩니다.
