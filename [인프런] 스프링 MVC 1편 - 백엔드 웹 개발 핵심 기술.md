@@ -159,3 +159,9 @@
 #### 서블릿 MVC 패턴
 - 컨트롤러(서블릿)의 역할과 뷰를 렌더링(JSP) 하는 역할을 명확하게 구분할 수 있었습니다.
 - 그런데 컨트롤러는 딱 봐도 중복이 많고, 필요하지 않는 코드들도 많이 보였습니다. (공통처리에도 어려웠음)
+
+#### ViewPath에 중복
+- String viewPath = "/WEB-INF/views/new-form.jsp";
+- prefix: /WEB-INF/views/
+- suffix: .jsp
+
