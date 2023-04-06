@@ -165,3 +165,20 @@
 - prefix: /WEB-INF/views/
 - suffix: .jsp
 
+### 스프링 MVC 구조 이해
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230334437-977978fb-c4f5-493c-8873-cf154815a727.png">
+
+#### 주요 인터페이스 목록
+- 핸들러 매핑 : `org.springframework.web.servlet.HandlerMapping`
+- 핸들러 어댑터 : `org.springframework.web.servlet.HandlerAdapter`
+- 뷰 리졸버 : `org.springframework.web.servlet.ViewResolver`
+- 뷰 : `org.springframework.web.servlet.View`
+
+#### 주요 인터페이스 요약
+- 핸들러 매핑 : 요청 URL에 매핑된 **핸들러(컨트롤러)를 조회**합니다.
+- 핸들러 어댑터 : 핸들러를 **실행할 수 있는 핸들러 어댑터를 조회**하고 실행 후 핸들러가 반환하는 **ModelAndView**로 변환해서 뷰 리졸버를 찾고 실행합니다.
+- 뷰 리졸버 : 뷰의 논리 이름을 **물리 이름(절대경로)**으로 바꾸고, 렌더링 역할을 담당하는 뷰 객체를 반환합니다.
+- 뷰 : 뷰를 통해서 뷰를 렌더링 합니다.
+
+
+
