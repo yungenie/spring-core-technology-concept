@@ -184,4 +184,48 @@
 - RequestMappingHandlerMapping 은 스프링 빈 중에서 @RequestMapping 또는 @Controller가 클래스 레벨에 붙어 있는 경우에 매핑 정보로 인식합니다.
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230586211-c4d15e5a-6729-46ff-9f41-914386195fcc.png">
 
+#### 컨트롤러 통합
+- @RequestMapping을 잘 보면 클래스 단위가 아니라 메서드 단위로 클래스를 유연하게 하나로 통합할 수 있습니다.
 
+/**
+* 클래스 단위 -> 메서드 단위
+* @RequestMapping 클래스 레벨과 메서드 레벨 조합
+*/
+@Controller
+@RequestMapping("/springmvc/v2/members")
+public class SpringMemberControllerV2 {
+
+private MemberRepository memberRepository = MemberRepository.getInstance();
+
+@RequestMapping("/new-form")
+public ModelAndView newForm() {
+
+return new ModelAndView("new-form");
+}
+
+@RequestMapping("/save")
+public ModelAndView save(HttpServletRequest request, HttpServletResponse
+response) {
+
+String username = request.getParameter("username");
+int age = Integer.parseInt(request.getParameter("age"));
+
+Member member = new Member(username, age);
+memberRepository.save(member);
+
+ModelAndView mav = new ModelAndView("save-result");
+mav.addObject("member", member);
+return mav;
+}
+
+@RequestMapping
+public ModelAndView members() {
+
+List<Member> members = memberRepository.findAll();
+
+ModelAndView mav = new ModelAndView("members");
+mav.addObject("members", members);
+return mav;
+}
+
+}
