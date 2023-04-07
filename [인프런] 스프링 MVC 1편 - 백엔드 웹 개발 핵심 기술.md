@@ -180,7 +180,7 @@
 - 뷰 리졸버 : 뷰의 논리 이름을 **물리 이름(절대경로)** 으로 바꾸고, 렌더링 역할을 담당하는 뷰 객체를 반환합니다.
 - 뷰 : 뷰를 통해서 뷰를 렌더링 합니다.
 
-#### 컨트롤러 어노테이
+#### 컨트롤러 어노테이션 
 - RequestMappingHandlerMapping 은 스프링 빈 중에서 @RequestMapping 또는 @Controller가 클래스 레벨에 붙어 있는 경우에 매핑 정보로 인식합니다.
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230586211-c4d15e5a-6729-46ff-9f41-914386195fcc.png">
 
