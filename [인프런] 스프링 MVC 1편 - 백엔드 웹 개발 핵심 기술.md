@@ -236,6 +236,7 @@ public class SpringMemberControllerV2 {
 
 #### @RequestParam HTTP Method 사용
 - URL 매칭, HTTP Method도 함께 구분할 수 있습니다.
+- @RequestParam 만 사용하게 되면 Get,Post Method 모두 받기때문에 side effect 우려도 있습니다.
 
 ```java
 @RequestMapping(value = "/new-form", method = RequestMethod.GET)
@@ -247,44 +248,46 @@ public class SpringMemberControllerV2 {
 
 ```java
 @Controller
-@RequestMapping("/springmvc/v2/members")
-public class SpringMemberControllerV2 {
+@RequestMapping("/springmvc/v3/members")
+public class SpringMemberControllerV3 {
 
     private MemberRepository memberRepository = MemberRepository.getInstance();
 
     //@RequestMapping("/new-form") //RequestMapping get 쿼리 파라미터, post form 방식 모두 지원
     //@RequestMapping(value = "/new-form", method = RequestMethod.GET)
-    @GetMapping
-    public ModelAndView newForm() {
-        return new ModelAndView("new-form");
+    @GetMapping("/new-form")
+    public String newForm() {
+        return "new-form";
     }
 
-    @RequestMapping("/save")
-    public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
-        String username = request.getParameter("username");
-        int age = Integer.parseInt(request.getParameter("age"));
+    @PostMapping("/save")
+    public String save(
+            @RequestParam("username") String username, 
+            @RequestParam("age") int age, // 타입 캐스팅, 변환까지 자동으로 해줍니다.
+            Model model) {
 
         Member member = new Member(username, age);
         memberRepository.save(member);
 
-        ModelAndView mv = new ModelAndView("save-result");
-        mv.addObject("member", member);
-        return mv;
+        model.addAttribute("member", member);
+        return "save-result";
     }
 
-    @RequestMapping
-    public ModelAndView members() {
+    @GetMapping
+    public String members(Model model) {
 
         List<Member> members = memberRepository.findAll();
 
-        ModelAndView mv = new ModelAndView("members");
-        mv.addObject("members", members);
-        return mv;
+        model.addAttribute("members", members);
+        return "members";
     }
 }
 ```
 
 #### @GetMapping 애노테이션 내부
-@GetMapping 애노테이션 코드를 열어보면 @RequestMapping 애노테이션을 내부에 가지고 있습니다.
-
+- @GetMapping 애노테이션 코드를 열어보면 @RequestMapping 애노테이션을 내부에 가지고 있습니다.
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230761186-833c83fc-1933-441e-8d80-9ad54a5e1e58.png">
+
+#### 정리
+- 애노테이션도 악착같이 기능이 업그레이드 되어 있는 걸 볼 수 있습니다.
+- 그래서, 애노테이션 안에 애노테이션 조합을 확인 할 수 있습니다.
