@@ -228,3 +228,63 @@ public class SpringMemberControllerV2 {
     }
 }
 ```
+#### 컨트롤러 실용적인 방식
+
+#### @RequestParam 사용
+- 스프링은 HTTP 요청 파라미터를 @RequestParam 받을 수 있습니다.
+- GET 쿼리 파라미터, POST Form 방식을 모두 지원합니다.
+
+#### @RequestParam HTTP Method 사용
+- URL 매칭, HTTP Method도 함께 구분할 수 있습니다.
+
+```java
+@RequestMapping(value = "/new-form", method = RequestMethod.GET)
+```
+
+#### @GetMapping, @PostMapping
+- 위 애노테이션 대신 더 간편하고 편리하게 사용할 수 있습니다.
+- Get,Post, Put, Delete, Patch 모두 준비되어 있습니다.
+
+```java
+@Controller
+@RequestMapping("/springmvc/v2/members")
+public class SpringMemberControllerV2 {
+
+    private MemberRepository memberRepository = MemberRepository.getInstance();
+
+    //@RequestMapping("/new-form") //RequestMapping get 쿼리 파라미터, post form 방식 모두 지원
+    //@RequestMapping(value = "/new-form", method = RequestMethod.GET)
+    @GetMapping
+    public ModelAndView newForm() {
+        return new ModelAndView("new-form");
+    }
+
+    @RequestMapping("/save")
+    public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
+        String username = request.getParameter("username");
+        int age = Integer.parseInt(request.getParameter("age"));
+
+        Member member = new Member(username, age);
+        memberRepository.save(member);
+
+        ModelAndView mv = new ModelAndView("save-result");
+        mv.addObject("member", member);
+        return mv;
+    }
+
+    @RequestMapping
+    public ModelAndView members() {
+
+        List<Member> members = memberRepository.findAll();
+
+        ModelAndView mv = new ModelAndView("members");
+        mv.addObject("members", members);
+        return mv;
+    }
+}
+```
+
+#### @GetMapping 애노테이션 내부
+@GetMapping 애노테이션 코드를 열어보면 @RequestMapping 애노테이션을 내부에 가지고 있습니다.
+
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230761186-833c83fc-1933-441e-8d80-9ad54a5e1e58.png">
