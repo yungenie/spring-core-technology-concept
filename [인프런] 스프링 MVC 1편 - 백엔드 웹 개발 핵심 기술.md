@@ -299,3 +299,6 @@ public class SpringMemberControllerV3 {
 #### spring boot packaging
 - Jar는 항상 내장 서버(톰캣등)를 사용하고 webapp 경로도 사용하지 않으므로, **내장 서버 사용에 최적화**되어 최근에는 주로 이 방식을 사용합니다.
 - War는 주로 **외부 서버 배포**의 목적으로 사용합니다. 내장 서버도 사용 가능합니다.
+
+#### Welcome 페이지
+- 스프링 부트에 Jar 사용하면 /resources/static/위치에 index.html 파일을 두면 Welcome 페이지로 처리해줍니다.
