@@ -468,3 +468,32 @@ public String mappingPath(@PathVariable String userId, @PathVariable Long orderI
     return "ok";
 }
 ```
+
+```java
+/**
+ * Content-Type 헤더 기반 추가 매핑 Media Type
+ * consumes="application/json"
+ * consumes="!application/json"
+ * consumes="application/*"
+ * consumes="*\/*"
+ * MediaType.APPLICATION_JSON_VALUE
+ */
+@PostMapping(value = "/mapping-consume", consumes = MediaType.APPLICATION_JSON_VALUE)
+public String mappingConsumes() {
+    log.info("mappingConsumes");
+    return "ok";
+}
+
+/**
+ * Accept 헤더 기반 Media Type
+ * produces = "text/html"
+ * produces = "!text/html"
+ * produces = "text/*"
+ * produces = "*\/*"
+ */
+@PostMapping(value = "/mapping-produce", produces = MediaType.TEXT_HTML_VALUE)
+public String mappingProduces() {
+    log.info("mappingProduces");
+    return "ok";
+}
+```
