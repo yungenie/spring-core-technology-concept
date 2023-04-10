@@ -140,7 +140,7 @@
 - HTML form 데이터도 HTTP 메시지 파라미터로 조회를 할 수 있다. (request.getParameter(...)) 
 - 조회는 가능하지만, 데이터 파싱을 불가합니다.
 
-### 서블릿, JSP, MVC 패턴
+## 서블릿, JSP, MVC 패턴
 - 서블릿 → JSP → MVC 패턴 점진적으로 개선한 순서입니다.
 - JSP 같은 뷰 템플릿은 화면을 렌더링 하는 데 최적화 되어 있습니다.
 
@@ -165,7 +165,7 @@
 - prefix: /WEB-INF/views/
 - suffix: .jsp
 
-### 스프링 MVC 구조 이해
+## 스프링 MVC 구조 이해
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230334437-977978fb-c4f5-493c-8873-cf154815a727.png">
 
 #### 주요 인터페이스 목록
@@ -293,7 +293,7 @@ public class SpringMemberControllerV3 {
 - 그래서, 애노테이션 안에 애노테이션 조합을 확인 할 수 있습니다.
 
 
-### 스프링 MVC 기본기능
+## 스프링 MVC 기본기능
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230826207-329059dd-f241-4926-96a2-2228097370a6.png">
 
 #### spring boot packaging
@@ -302,3 +302,133 @@ public class SpringMemberControllerV3 {
 
 #### Welcome 페이지
 - 스프링 부트에 Jar 사용하면 /resources/static/위치에 index.html 파일을 두면 Welcome 페이지로 처리해줍니다.
+
+
+#### @RestController vs @Controller 차이점
+- @Controller 는 반환 타입이 String 이면 뷰 이름으로 인식됩니다. 그래서 뷰를 찾고 뷰가 랜더링 됩니다.
+- @RestController 는 반환 값으로 뷰를 찾는 것이 아니라, HTTP 메시지 바디에 바로 입력됩니다.
+
+
+```java
+@RestController
+public class LogTestController {
+
+
+    @RequestMapping("/log-test")
+    public String logTest() {
+        String name = "Spring";
+
+        System.out.println("name = " + name);
+
+        return "ok";
+    }
+}
+```
+
+```java
+@Controller
+public class LogTestController {
+
+
+    @RequestMapping("/log-test")
+    public String logTest() {
+        String name = "Spring";
+
+        System.out.println("name = " + name);
+
+        return "log-form";
+    }
+}
+```
+
+
+### 로깅(logging)
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230831384-b287049f-6b21-456e-9da1-a2c294b078bb.png">
+
+- Spring Boot는 로깅 라이브러리가 포함되어 있습니다. 
+- Logback, log4J, log4J2 등 수 많은 로그 라이브러리가 존재합니다.  
+- 많은 로그 라이브러리 통합해서 인터페이스로 제공하는 것이 SLF4J 라이브러리입니다. 
+- 구현체인 Logback이 Spring Boot가 기본으로 제공하고 성능도 좋고 기능도 많이 지원해서 실무에서 대부분 사용합니다. 
+
+
+> 운영 시스템에서는 System.out.println() 시스템 콘솔로 출력하지 않고, 별도의 로깅 라이브버리를 사용해서 로그를 출력합니다.   
+> 왜? 로그 레벨에 상관없이 시스템 콘솔은 다 찍힙니다. 운영 시스템에서는 중요한 로그만 찍기 위해서 입니다.
+
+
+- Spring Boot 기본 Logger 사용
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@RestController
+public class LogTestController {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+    //private final Logger log = LoggerFactory.getLogger(LogTestController.class); // 클래스명 수동기입 가능
+    //private static final Logger log = LoggerFactory.getLogger(LogTestController.class);
+
+    @RequestMapping("/log-test")
+    public String logTest() {
+        String name = "Spring";
+
+        System.out.println("name = " + name);
+
+        log.trace("trace my log="+ name); 
+        log.trace("trace log={}, {}, {}", name, name, name); 
+        log.debug("debug log={}", name);
+        log.info(" info log={}", name);
+        log.warn(" warn log={}", name);
+        log.error("error log={}", name);
+
+        return "ok";
+    }
+}
+```
+
+- lombok 룸북 제공으로 로그 미선언 
+```java
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class LogTestController {
+
+    @RequestMapping("/log-test")
+    public String logTest() {
+        String name = "Spring";
+
+        System.out.println("name = " + name);
+
+        log.trace("trace my log="+ name); 
+        log.trace("trace log={}, {}, {}", name, name, name); 
+        log.debug("debug log={}", name);
+        log.info(" info log={}", name);
+        log.warn(" warn log={}", name);
+        log.error("error log={}", name);
+
+        return "ok";
+    }
+}
+```
+
+
+#### 로그 레벨 설정
+- application.properties
+- root level, package level 둘다 설정하면 package가 우선권을 가집니다.
+- TRACE < DEBUG < INFO < WARN < ERROR
+- 예를 들어 INFO 레벨로 설정을 하면 하위 레벨을 로그에 찍히지 않고, INFO 이상의 레벨만 찍힙니다.
+
+```
+#전체 로그 레벨 설정(기본 info)
+logging.level.root=info
+
+#hello.springmvc 패키지와 그 하위 로그 레벨 설정
+logging.level.hello.springmvc=debug
+```
+
+#### 올바른 로그 사용법
+- log.debug("data="+data)
+    - 로그 레벨을 info로 설정해도 실제론 "data="+data 연산이 발생하므로, CPU/메모리를 사용해서 쓸모없는 자원을 사용하게 됩니다.
+- log.debug("data={}", data)
+    - 로그 레벨 info로 설정하면 앞과 같은 의미없는 연산이 발생하지 않습니다. debug 메소드 내에서 실행을 하지 않습니다.
+
+
