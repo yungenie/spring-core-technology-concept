@@ -291,3 +291,11 @@ public class SpringMemberControllerV3 {
 #### 정리
 - 애노테이션도 악착같이 기능이 업그레이드 되어 있는 걸 볼 수 있습니다.
 - 그래서, 애노테이션 안에 애노테이션 조합을 확인 할 수 있습니다.
+
+
+### 스프링 MVC 기본기능
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230826207-329059dd-f241-4926-96a2-2228097370a6.png">
+
+#### spring boot packaging
+- Jar는 항상 내장 서버(톰캣등)를 사용하고 webapp 경로도 사용하지 않으므로, **내장 서버 사용에 최적화**되어 최근에는 주로 이 방식을 사용합니다.
+- War는 주로 **외부 서버 배포**의 목적으로 사용합니다. 내장 서버도 사용 가능합니다.
