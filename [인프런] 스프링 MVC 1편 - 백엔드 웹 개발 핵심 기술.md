@@ -469,6 +469,7 @@ public String mappingPath(@PathVariable String userId, @PathVariable Long orderI
 }
 ```
 
+- 미디어 타입 조건 매
 ```java
 /**
  * Content-Type 헤더 기반 추가 매핑 Media Type
