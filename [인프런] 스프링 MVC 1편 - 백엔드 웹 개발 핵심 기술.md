@@ -431,4 +431,40 @@ logging.level.hello.springmvc=debug
 - log.debug("data={}", data)
     - 로그 레벨 info로 설정하면 앞과 같은 의미없는 연산이 발생하지 않습니다. debug 메소드 내에서 실행을 하지 않습니다.
 
+### 요청 매핑
 
+#### Path Variable
+- HTTP API는 리소스 경로에 식별자를 넣는 스타일을 선호합니다.
+```java
+/**
+ * PathVariable 사용
+ */
+@GetMapping("/mapping/{userId}")
+public String mappingPath(@PathVariable("userId") String data) {
+    log.info("mappingPath userId={}", data);
+    return "ok";
+}
+```    
+
+```java
+/**
+ * PathVariable 사용, 변수명이 같으면 생략 가능
+ */
+@GetMapping("/mapping/{userId}")
+public String mappingPath(@PathVariable String userId) {
+    log.info("mappingPath userId={}", userId);
+    return "ok";
+}
+```   
+
+#### Path Variable 다중
+```java
+/**
+* PathVariable 사용 다중
+*/
+@GetMapping("/mapping/users/{userId}/orders/{orderId}")
+public String mappingPath(@PathVariable String userId, @PathVariable Long orderId) {
+    log.info("mappingPath userId={}, orderId={}", userId, orderId);
+    return "ok";
+}
+```
