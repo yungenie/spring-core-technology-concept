@@ -473,7 +473,7 @@ public String mappingPath(@PathVariable String userId, @PathVariable Long orderI
 - 미디어 타입 조건 매핑 
 ```java
 /**
- * Content-Type 헤더 기반 추가 매핑 Media Type (요청받을 때 조건) 
+ * Content-Type 헤더 기반 추가 매핑 Media Type (요청 Header의 Content-Type) 
  * consumes="application/json"
  * consumes="!application/json"
  * consumes="application/*"
@@ -487,7 +487,7 @@ public String mappingConsumes() {
 }
 
 /**
- * Accept 헤더 기반 Media Type (응답할 때 조건) 
+ * Accept 헤더 기반 Media Type (요청 Header의 Accept와 produces랑 동일해야합니다.) 
  * produces = "text/html"
  * produces = "!text/html"
  * produces = "text/*"
