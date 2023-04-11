@@ -430,7 +430,7 @@ logging.level.hello.springmvc=debug
     - 로그 레벨을 info로 설정해도 실제론 "data="+data 연산이 발생하므로, CPU/메모리를 사용해서 쓸모없는 자원을 사용하게 됩니다.
 - log.debug("data={}", data)
     - 로그 레벨 info로 설정하면 앞과 같은 의미없는 연산이 발생하지 않습니다. debug 메소드 내에서 실행을 하지 않습니다.
-    - 포맷 인수 형태로 지정하는 게 좋습니다. log.trace("trace log={}, {}, {}", name, name, name); 다중 출력도 가능합니다. 
+    - 포맷 인수 형태로 지정하는 게 좋습니다. log.trace("trace log={}, {}, {}", name, name, name); 다중 출력도 가능합니다.  
 
 ### 요청 매핑
 
