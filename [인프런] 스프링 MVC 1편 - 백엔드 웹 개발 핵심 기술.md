@@ -302,7 +302,7 @@ public class SpringMemberControllerV3 {
 
 #### Welcome 페이지
 - 스프링 부트에 Jar 사용하면 /resources/static/위치에 index.html 파일을 두면 Welcome 페이지로 처리해줍니다.
-
+- Jar를 사용하면 webapp 경로를 사용할 수 없슨다. /resources/static 경로는 외부에 공개가 됩니다. controller에 매핑이 되지 않으면 해당 정적 리소스로 열리게 됩니다.  
 
 #### @RestController vs @Controller 차이점
 - @Controller 는 반환 타입이 String 이면 뷰 이름으로 인식됩니다. 그래서 뷰를 찾고 뷰가 랜더링 됩니다.
@@ -432,7 +432,7 @@ logging.level.hello.springmvc=debug
     - 로그 레벨 info로 설정하면 앞과 같은 의미없는 연산이 발생하지 않습니다. debug 메소드 내에서 실행을 하지 않습니다.
     - 포맷 인수 형태로 지정하는 게 좋습니다. log.trace("trace log={}, {}, {}", name, name, name); 다중 출력도 가능합니다.  
 
-### 요청 매핑
+### 요청 매핑 (요청 파라미터)
 
 #### Path Variable
 - HTTP API는 리소스 경로에 식별자를 넣는 스타일을 선호합니다.
@@ -497,5 +497,148 @@ public String mappingConsumes() {
 public String mappingProduces() {
     log.info("mappingProduces");
     return "ok";
+}
+```
+
+#### HTTP 요청 파라미터 종류
+- Servelt 구현시에는 HTTP method 상관없이 request.getParameter()로 값을 가져왔습니다.
+- GET 쿼리 파라미터
+- POST HTML Form 
+- HTTP message body에 데이터를 직접 담아서 요청 (JSON/XML/TEXT)
+
+#### @RequestParam @ModelAttribute
+- 최근 HTTP 스펙에서는 Get도 HTTP Body에 넣어서 보낼 순 있지만, 선호하는 방식은 아닙니다.
+
+```java
+@Slf4j
+@Controller
+public class RequestParamController {
+
+    /**
+     * Servlet 방식
+     * 반환 타입이 없고 응답에 값을 직접 집어넣으면, view 화면으로 매핑되지 않고 값이 반환됩니다.
+     */
+    @RequestMapping("/request-param-v1")
+    public void requestParamV1(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String username = request.getParameter("username");
+        int age = Integer.parseInt(request.getParameter("age"));
+        log.info("username={}, age={}", username, age);
+        response.getWriter().write("ok");
+    }
+
+    /**
+     * @RequestParam 사용 : 파라미터 이름으로 바인딩
+     * @ResponseBody 추가 : View 조회를 무시하고, HTTP message body에 직접 해당 내용 입력
+     */
+    @ResponseBody
+    @RequestMapping("/request-param-v2")
+    public String requestParamV2(
+            @RequestParam("username") String memberName,
+            @RequestParam("age") int memberAge) {
+
+        log.info("username={}, age={}", memberName, memberAge);
+        return "ok";
+    }
+
+    /**
+     * @RequestParam 사용 : HTTP 파라미터 이름이 변수 이름과 같으면 @RequestParam(name="xx") 생략 가능
+     */
+    @ResponseBody
+    @RequestMapping("/request-param-v3")
+    public String requestParamV3(
+            @RequestParam String username,
+            @RequestParam int age) {
+
+        log.info("username={}, age={}", username, age);
+        return "ok";
+    }
+
+    /**
+     * @RequestParam 사용 : String, int 등의 단순 타입이면 @RequestParam 도 생략 가능
+     * ※ @RequestParam 생략하면 스프링 MVC는 내부에서 required=false 적용함.
+     */
+    @ResponseBody
+    @RequestMapping("/request-param-v4")
+    public String requestParamV4(String username, int age) {
+        log.info("username={}, age={}", username, age);
+        return "ok";
+    }
+
+    /**
+     * @RequestParam.required 사용
+     *
+     * 주의!
+     * /request-param-required?username= -> 빈문자로 통과
+     *
+     * 주의!
+     * /request-param-required
+     * int age -> null을 int에 입력하는 것은 불가능, 따라서 Integer 변경해야 함(또는 다음에 나오는 defaultValue 사용)
+     */
+    @ResponseBody
+    @RequestMapping("/request-param-required")
+    public String requestParamRequired(
+            @RequestParam(required = true) String username,
+            @RequestParam(required = false) Integer age) {
+
+        log.info("username={}, age={}", username, age);
+        return "ok";
+    }
+
+    /**
+     * @RequestParam : defaultValue 사용
+     *
+     * 참고: defaultValue는 빈 문자의 경우에도 적용
+     * /request-param-default?username=
+     * 단, "" 빈문자열 값의 경우는 예외처리 해야함.
+     */
+    @ResponseBody
+    @RequestMapping("/request-param-default")
+    public String requestParamDefault(
+            @RequestParam(required = true, defaultValue = "guest") String username,
+            @RequestParam(required = false, defaultValue = "-1") int age) {
+
+        log.info("username={}, age={}", username, age);
+        return "ok";
+    }
+
+    /**
+     * @RequestParam Map, MultiValueMap
+     * Map(key=value)
+     * MultiValueMap(key=[value1, value2, ...]) ex) (key=userIds, value=[id1, id2])
+     * 잘 사용하지 않는 것으로 보임
+     */
+    @ResponseBody
+    @RequestMapping("/request-param-map")
+    public String requestParamMap(@RequestParam Map<String, Object> paramMap) {
+        log.info("username={}, age={}", paramMap.get("username"), paramMap.get("age"));
+        return "ok";
+    }
+
+    /**
+     * @ModelAttribute 사용
+     * 참고: model.addAttribute(helloData) 코드도 함께 자동 적용됨
+     * 과정 : 요청 파라미터를 받아 객체의 프로퍼티에 바인딩 합니다.
+     * 1. 객체 생성 (DTO/VO/Model)
+     * 2. 요청 파라미터명으로 객체의 프로퍼티를 찾습니다.
+     * 3. 해당 프로퍼티의 setter() 호출 후 요청 파라미터의 값을 인자로 바인딩합니다.
+     */
+    @ResponseBody
+    @RequestMapping("/model-attribute-v1")
+    public String modelAttributeV1(@ModelAttribute HelloData helloData) {
+        log.info("username={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "ok";
+    }
+    
+    /**
+     * @ModelAttribute 생략 가능
+     * String, int 같은 단순 타입 = @RequestParam
+     * argument resolver 로 지정해둔 타입 외 = @ModelAttribute
+     */
+    @ResponseBody
+    @RequestMapping("/model-attribute-v2")
+    public String modelAttributeV2(HelloData helloData) {
+        log.info("username={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "ok";
+    }
 }
 ```
