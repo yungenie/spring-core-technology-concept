@@ -642,3 +642,30 @@ public class RequestParamController {
     }
 }
 ```
+
+### HTTP 요청 메시지 JSON
+#### @ModelAttribute , @RequestParam 애노테이션 생략
+- 스프링에서 @ModelAttribute , @RequestParam 애노테이션 생략시 다음과 같은 규칙이 적용됩니다.
+- String , int , Integer 같은 단순 타입의 파라미터만 있는 경우 = @RequestParam
+- 객체(model) 타입 혹은 argument resolver 로 지정해둔 타입 외 나머지 경우 = @ModelAttribute
+
+
+```java
+    @ResponseBody
+    @PostMapping("/request-body-json-v5")
+    public HelloData requestBodyJsonV5(@RequestBody HelloData data) {
+        log.info("username={}, age={}", data.getUsername(), data.getAge());
+        return data;
+    }
+```
+- 객체를 받는 파라미터의 경우 @RequestBody 생략하면 @ModelAttribute 가 적용됩니다.
+- @ModelAttribute가 적용되면 HTTP 메시지 바디가 아니라 HTTP 요청 파라미터에서 데이터를 찾으므로, 데이터 매핑이 안됩니다. 
+
+#### @RequestBody 요청,  @ResponseBody 응답 정리
+- @RequestBody 요청 : JSON요청 -> HTTP 메시지 컨버터 > 객체 
+- @ResponseBody 응답 : 객체 -> HTTP 메시지 컨버터 -> JSON응답
+- ※ @ResponseBody 애노테이션을 적용하면 객체가 JSON 타입으로 반환하므로, 그 외 타입 반환 시 다른 처리가 필요하므로 유의해야합니다.
+
+
+
+
