@@ -666,6 +666,15 @@ public class RequestParamController {
 - @ResponseBody 응답 : 객체 -> HTTP 메시지 컨버터 -> JSON응답
 - ※ @ResponseBody 애노테이션을 적용하면 객체가 JSON 타입으로 반환하므로, 그 외 타입 반환 시 다른 처리가 필요하므로 유의해야합니다.
 
+#### Thymeleaf 스프링 부트 설정
+- 스프링 부트가 자동으로 ThymeleafVeiwResolver와 필요한 스프링 빈을 등록해주고 기본으로 설정 값을 셋팅해줍니다.
+
+```
+application.properties
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+```
+
 
 
 
