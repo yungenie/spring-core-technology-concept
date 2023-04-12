@@ -675,6 +675,21 @@ spring.thymeleaf.prefix=classpath:/templates/
 spring.thymeleaf.suffix=.html
 ```
 
+#### HTTP API
+- @Controller, @ResponseBody 둘다 적용한 애노테이션이 @RestController 입니다.
 
+```java
+@Slf4j
+@RestController
+public class ResponseBodyController {
 
-
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/response-body-json-v2")
+    public HelloData responseBodyJsonV2() {
+        HelloData helloData = new HelloData();
+        helloData.setUsername("userA");
+        helloData.setAge(20);
+        return helloData;
+    }
+}
+```
