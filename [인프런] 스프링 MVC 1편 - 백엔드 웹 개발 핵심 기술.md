@@ -303,6 +303,9 @@ public class SpringMemberControllerV3 {
 #### Welcome 페이지
 - 스프링 부트에 Jar 사용하면 /resources/static/위치에 index.html 파일을 두면 Welcome 페이지로 처리해줍니다.
 - Jar를 사용하면 webapp 경로를 사용할 수 없슨다. /resources/static 경로는 외부에 공개가 됩니다. controller에 매핑이 되지 않으면 해당 정적 리소스로 열리게 됩니다.  
+- src/main/resources 는 리소스를 보관하는 곳이고, 또 클래스패스의 시작 경로입니다. 
+- 따라서 다음 디렉토리에 리소스를 넣어두면 스프링 부트가 정적 리소스로 서비스를 제공합니다.
+
 
 #### @RestController vs @Controller 차이점
 - @Controller 는 반환 타입이 String 이면 뷰 이름으로 인식됩니다. 그래서 뷰를 찾고 뷰가 랜더링 됩니다.
