@@ -693,3 +693,123 @@ public class ResponseBodyController {
     }
 }
 ```
+
+### 정리 @RequestParam, @ModelAttribute, @RequestBody, @ResponseBody
+- 쿼리 파라미터 (@RequestParam)
+- HTML FORM (@ModelAttribute)
+- 단순 텍스트
+- API JSON (@RequestBody)
+
+#### 요청 파라미터 vs HTTP 메시지 바디
+- 요청 파라미터를 조회하는 기능: @RequestParam , @ModelAttribute
+- HTTP 메시지 바디를 직접 조회하는 기능: @RequestBody
+
+#### @RequestParam 
+ - GET /test?name=yunjingwak&id=yunjin;
+ - HTTP 쿼리 파라미터 이름과 바인딩(매핑)
+ - @RequestParam(name="xx") name 생략 가능 (단, HTTP 쿼리 파라미터 이름과 메소드의 파라미터 동일 해야함. required=true 디폴트)
+ - @RequestParam 애노테이션 생략 가능 (단, String, int등의 단순 타입일 경우. 스프링 MVC는 내부에서 required=false 적용함)
+ - defaultValue 사용 가능 (단, "" 빈 문자열 값을 예외처리 해야함. 빈 문자는 defaultValue 적용함. ex /request-param-default?username=&age=29)
+
+```java
+@Controller
+public class RequestParamController {
+
+      @ResponseBody
+    @RequestMapping("/request-param-v2")
+    public String requestParamV2(
+            @RequestParam("username") String memberName,
+            @RequestParam("age") int memberAge) {
+
+        log.info("username={}, age={}", memberName, memberAge);
+        return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping("/request-param-v3")
+    public String requestParamV3(
+            @RequestParam String username,
+            @RequestParam int age) {
+
+        log.info("username={}, age={}", username, age);
+        return "ok";
+    }
+
+      @ResponseBody
+    @RequestMapping("/request-param-v4")
+    public String requestParamV4(String username, int age) {
+        log.info("username={}, age={}", username, age);
+        return "ok";
+    }
+
+      @ResponseBody
+    @RequestMapping("/request-param-default")
+    public String requestParamDefault(
+            @RequestParam(required = true, defaultValue = "guest") String username,
+            @RequestParam(required = false, defaultValue = "-1") int age) {
+
+        log.info("username={}, age={}", username, age);
+        return "ok";
+    }
+}
+```
+
+#### @ModelAttribute
+ - GET/POST HTML Form 요청시 Form data와 VO 객체 바인딩(매핑) 
+ - @ModelAttribute 애노테이션 생략 가능
+
+```java
+@Controller
+public class ControllerTest {
+	
+    @ResponseBody
+    @GetMapping("/model-attribute-get-test-v1")
+    public String modelAttributeGetTestV1(@ModelAttribute HelloData helloData) {
+        log.info("username={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "ok";
+    }
+
+    @ResponseBody
+    @GetMapping("/model-attribute-get-test-v2")
+    public String modelAttributeGetTestV2(HelloData helloData) {
+        log.info("username={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "ok";
+    }
+
+    @ResponseBody
+    @PostMapping("/model-attribute-post-test-v1")
+    public String modelAttributePostTestV1(@ModelAttribute HelloData helloData) {
+        log.info("username={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "ok";
+    }
+
+    @ResponseBody
+    @PostMapping("/model-attribute-post-test-v2")
+    public String modelAttributePostTestV2(HelloData helloData) {
+        log.info("username={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "ok";
+    }
+}
+```
+
+#### @RequestBody
+ - GET/POST Content-Type:application/json & VO 객체 바인딩(매핑)
+ - JSON요청 -> HTTP 메시지 컨버터 > 객체
+ - @RequestBody 애노테이션 생략 안됨
+
+#### @ResponseBody
+ - @ResponseBody 응답 : 객체 -> HTTP 메시지 컨버터 -> JSON응답
+ - @ResponseBody 애노테이션을 적용하면 객체가 JSON 타입으로 반환하므로, 그 외 타입 반환 시 다른 처리가 필요하므로 유의해야합니다.
+ - View 조회를 무시하고, HTTP message body에 직접 해당 내용 입력
+
+#### @Controller & return String
+ - ViewResolver를 찾고 해당 문자열(논리이름)에 해당하는 물리적 경로로 변경 후 뷰로 이동합니다.
+
+#### @Controller & @ResponseBody & return String
+ - ViewResolver 찾지 않고 문자열 자체가 return 됩니다.
+ - 2개 애노테이션을 사용하지 않고 @RestController로 해결 가능 (API 주로 사용)
+
+#### @Controller & @ResponseBody & return VO
+- json변환해서 나갑니다.
+
+
