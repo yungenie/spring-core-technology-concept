@@ -858,3 +858,10 @@ public class ControllerTest {
 
 #### 상태경로 vs 절대경로
 
+#### 컨트롤 URL
+- 말 그대로 controller단 URL 형식을 뜻합니다.
+- HTML FORM은 GET,POST만 지원
+- 제약을 해결하기 위해 **동사**로 된 **리소스 경로** 사용
+- HTML FORM POST의 /new, /edit, /delete가 컨트롤 URL ex)/members,  /members/{id}, /members/add, /members/{id}/edit, /members/{id}/delete 등등
+- RESTAPI 설계시 HTTP Method GET,POST,DELETE,PATCH 등을 사용해서 /members, /members/{id} CRUD를 URL상으로 알아차리지 않게끔 하는 방법도 있습니다.
+
