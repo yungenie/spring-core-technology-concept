@@ -824,6 +824,16 @@ public class ControllerTest {
 - src/main/resources/templates 경로에서 viewName .html/.jsp 등 매핑됩니다.
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231961952-d494e1a1-84b2-4d5a-b893-71db145bb359.png">
 
+
+#### 타임리프 핵심
+- 서버 사이드에서 렌더링 되므로 기존 것을 대체 합니다.
+
+```<link th:href="@{/css/bootstrap.min.css}" href="../../static/css/bootstrap.min.css" rel="stylesheet">```
+	  
+- 타임리프 자체가 서버 사이드에서 렌더링 되는 거다 보니 [http://localhost:8080/css/bootstrap.min.css]로 호출이 됩니다.
+- 해당 [url]에 해당하는 핸들러 어댑터이 없기 때문에 main/resources/static에 있는 css로 찾아가게 됩니다.
+
+
 #### 폴더구조에 대해서
 - src/main/java,resources로 나뉩니다.
 - java는 .java 파일, Db관련 파일
