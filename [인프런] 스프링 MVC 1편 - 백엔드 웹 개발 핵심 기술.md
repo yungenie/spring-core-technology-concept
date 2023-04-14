@@ -856,10 +856,20 @@ public class ControllerTest {
 - ../ : 상위 디렉터리
 -   / : 최상루트
 
-#### 상태경로 vs 절대경로
-
 #### 컨트롤 URL
 - 서버단에서의 controller에 매핑되는 경로(url)를 표현합니다.
 - API로 설계를 한다면 HTTP Method(GET,POST,DELETE,PATCH,PUT)만 다르게 하여 동일한 /url 형식으로 나뉠 수 있습니다. ex)/members, /members/{id} 
 - HTML FROM GET/POST만 지원을 하는 제약 사항을 해결하기 위해 삭제, 수정 등에 대한 **동사**된 명명을 추가하여 **리소스의 경로**로 사용하므로 구분할 수 있게 함.
 - ex)/members, /members/{id}, /members/add, /members/{id}/edit, /members/{id}/delete 등등
+
+#### 상태경로 vs 절대경로
+
+#### 요청핸들러매핑어댑터
+-> 웹 페이지 만들기 전에 넣어야함.
+#### @RequiredArgsConstructor
+#### @PathVariable
+#### @ModelAttribute 2가지 특징
+- 생략가능. Item->itm
+- model.addAttribute() 생략가능.
+### PRG POST/Redirect/GET
+### RedirectAttributes
