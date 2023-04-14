@@ -820,3 +820,19 @@ public class ControllerTest {
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683597-601d1af2-35b9-4808-9579-b7b033c5cf91.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683478-20abac73-8b56-4d67-993f-102ebec320ff.png">
 
+### thymeleaf 템플릿엔진 동작 후 경로
+- src/main/resources/templates 경로에서 viewName .html/.jsp 등 매핑됩니다.
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231960641-be40577a-527b-41f4-98df-5781ff73118d.png">
+
+#### 폴더구조에 대해서
+- src/main/java,resources로 나뉩니다.
+- java는 .java 파일, Db관련 파일
+- resources static/templates .css/.html/설정파일 등이 존재합니다.
+
+#### 경로
+-  ./ : 현재경로
+- ../ : 상위 디렉터리
+-   / : 최상루트
+
+#### 상태경로 vs 절대경로
+
