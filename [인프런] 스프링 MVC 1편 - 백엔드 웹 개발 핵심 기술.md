@@ -822,7 +822,7 @@ public class ControllerTest {
 
 ### thymeleaf 템플릿엔진 동작 후 경로
 - src/main/resources/templates 경로에서 viewName .html/.jsp 등 매핑됩니다.
-<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231960641-be40577a-527b-41f4-98df-5781ff73118d.png">
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231961952-d494e1a1-84b2-4d5a-b893-71db145bb359.png">
 
 #### 폴더구조에 대해서
 - src/main/java,resources로 나뉩니다.
