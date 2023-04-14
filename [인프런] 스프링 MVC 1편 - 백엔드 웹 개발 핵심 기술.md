@@ -821,7 +821,7 @@ public class ControllerTest {
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683478-20abac73-8b56-4d67-993f-102ebec320ff.png">
 
 ### thymeleaf 템플릿엔진 동작 후 경로
-- src/main/resources/templates 경로에서 viewName .html/.jsp 등 매핑됩니다.
+- src/main/resources/templates 경로에서 viewName .html 등 매핑됩니다.
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231961952-d494e1a1-84b2-4d5a-b893-71db145bb359.png">
 
 
