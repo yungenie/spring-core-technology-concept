@@ -821,7 +821,7 @@ public class ControllerTest {
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683478-20abac73-8b56-4d67-993f-102ebec320ff.png">
 
 
-#### 정적 html에서 post로 submit을 하면 왜 오류가 나는 지?
+#### addForm.html에서 item.html post요청 시 오류 이유?
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994141-c9e3a9cb-86aa-4bf2-a451-c44a9164cb5a.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994232-75af5f45-d533-4a6d-bd7e-67882b0a08bd.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994367-c434e0c6-a4e3-49dd-a9e7-eb953d582552.png">
