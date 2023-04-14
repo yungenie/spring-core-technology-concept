@@ -820,6 +820,16 @@ public class ControllerTest {
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683597-601d1af2-35b9-4808-9579-b7b033c5cf91.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683478-20abac73-8b56-4d67-993f-102ebec320ff.png">
 
+
+#### 정적 html에서 post로 submit을 하면 왜 오류가 나는 지?
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994141-c9e3a9cb-86aa-4bf2-a451-c44a9164cb5a.png">
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994232-75af5f45-d533-4a6d-bd7e-67882b0a08bd.png">
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994367-c434e0c6-a4e3-49dd-a9e7-eb953d582552.png">
+
+
+
+
+
 ### thymeleaf 템플릿엔진 동작 후 경로
 - src/main/resources/templates 경로에서 viewName .html 등 매핑됩니다.
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231961952-d494e1a1-84b2-4d5a-b893-71db145bb359.png">
