@@ -825,9 +825,11 @@ public class ControllerTest {
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994141-c9e3a9cb-86aa-4bf2-a451-c44a9164cb5a.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994232-75af5f45-d533-4a6d-bd7e-67882b0a08bd.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994367-c434e0c6-a4e3-49dd-a9e7-eb953d582552.png">
+
 - HTTP method [post]는 http message body에 데이터를 담아 서버로 요청 데이터를 전달하는데 핸들러 어댑터의 url 매핑이 안됨.
 - 즉, 처리하는 컨트롤러가 없기 때문에 에러 페이지가 나왔음.
 - Get 요청이였다면 해당 url 매핑이 안되더라도 정적 리소스 [resource/static/~] 경로로 처리가 됨.
+
 
 ### thymeleaf 템플릿엔진 동작 후 경로
 - src/main/resources/templates 경로에서 viewName .html 등 매핑됩니다.
