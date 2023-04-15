@@ -359,6 +359,7 @@ public class LogTestController {
 
 
 - Spring Boot 기본 Logger 사용
+
 ```java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -762,7 +763,7 @@ public class RequestParamController {
  - @ModelAttribute 애노테이션 생략 가능
 
 
-
+```java
 @Controller
 public class ControllerTest {
 	
@@ -821,12 +822,10 @@ public class ControllerTest {
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683597-601d1af2-35b9-4808-9579-b7b033c5cf91.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683478-20abac73-8b56-4d67-993f-102ebec320ff.png">
 
-
 #### addForm.html에서 item.html post요청 시 오류 이유?
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994141-c9e3a9cb-86aa-4bf2-a451-c44a9164cb5a.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994232-75af5f45-d533-4a6d-bd7e-67882b0a08bd.png">
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231994367-c434e0c6-a4e3-49dd-a9e7-eb953d582552.png">
-
 
 - HTTP method [post]는 http message body에 데이터를 담아 서버로 요청 데이터를 전달하는데 핸들러 어댑터의 url 매핑이 안됨.  
 - 즉, 처리하는 컨트롤러가 없기 때문에 에러 페이지가 나왔음.  
@@ -863,6 +862,11 @@ public class ControllerTest {
 - ../ : 상위 디렉터리
 -   / : 최상루트
 
+#### 상대경로 vs 절대경로
+- 상대경로 : 현재 디렉토리(비교 대상)을 기준으로 작성된 경로
+- 절대경로 : 최상위 디렉토리가 반드시 포함된 경로
+
+
 #### 컨트롤 URL
 - 서버단에서의 controller에 매핑되는 경로(url)를 표현합니다.
 - API로 설계를 한다면 HTTP Method(GET,POST,DELETE,PATCH,PUT)만 다르게 하여 동일한 /url 형식으로 나뉠 수 있습니다. ex)/members, /members/{id} 
@@ -874,6 +878,24 @@ public class ControllerTest {
 - 서버가 관리하는 리소스 디텍토리로 리소스의 URL를 생성하고 관리합니다.
 - 위의 컨트롤 URL를 보면 컬렉션은 /members 입니다.
 - 큰 기능의 단위를 URL로 동사화하여 형식을 맞춘 디렉토리입니다.
+
+
+#### @PathVariable
+- HTTP API, HTML FORM 요청 시 리소스 경로에 식별자를 넣는 스타일을 선호합니다.
+- ex)/order/list/1, /order/cancel/1 등
+- @PathVariable 지정된 이름과 파라미터 이름이 같으면 생략할 수 있습니다.
+
+```java
+    @GetMapping("/order/list/{userId}")
+    public String mappingPath(@PathVariable("userId") String data) {
+         return "ok";
+    }
+    
+    @GetMapping("/order/list/{userId}")
+    public String mappingPath(String userId) { //{userId}식별자와 파라미터명 동일하면 생략가능
+         return "ok";
+    }    
+```
 
 #### @ModelAttribute 2가지 특징
 - 요청 파라미터 처리
@@ -920,12 +942,12 @@ public class ControllerTest {
     }
 ```
 
-#### 상태경로 vs 절대경로
+### PRG POST/Redirect/GET
+### RedirectAttributes
+
+
 
 #### 요청핸들러매핑어댑터
 -> 웹 페이지 만들기 전에 넣어야함.
 #### @RequiredArgsConstructor
-#### @PathVariable
 
-### PRG POST/Redirect/GET
-### RedirectAttributes
