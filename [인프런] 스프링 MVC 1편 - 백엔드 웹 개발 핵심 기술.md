@@ -867,6 +867,12 @@ public class ControllerTest {
 - 절대경로 : 최상위 디렉토리가 반드시 포함된 경로
 
 
+#### @RequiredArgsConstructor
+
+
+
+
+
 #### 컨트롤 URL
 - 서버단에서의 controller에 매핑되는 경로(url)를 표현합니다.
 - API로 설계를 한다면 HTTP Method(GET,POST,DELETE,PATCH,PUT)만 다르게 하여 동일한 /url 형식으로 나뉠 수 있습니다. ex)/members, /members/{id} 
@@ -977,5 +983,5 @@ public class ControllerTest {
 
 #### 요청핸들러매핑어댑터
 -> 웹 페이지 만들기 전에 넣어야함.
-#### @RequiredArgsConstructor
+
 
