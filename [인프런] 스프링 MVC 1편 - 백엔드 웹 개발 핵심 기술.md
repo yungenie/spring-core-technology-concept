@@ -862,14 +862,25 @@ public class ControllerTest {
 - HTML FROM GET/POST만 지원을 하는 제약 사항을 해결하기 위해 삭제, 수정 등에 대한 **동사**된 명명을 추가하여 **리소스의 경로**로 사용하므로 구분할 수 있게 함.
 - ex)/members, /members/{id}, /members/add, /members/{id}/edit, /members/{id}/delete 등등
 
+#### 컬렉션(Collection)
+- Java Collection 을 뜻하는 게 아닙니다.
+- 서버가 관리하는 리소스 디텍토리로 리소스의 URL를 생성하고 관리합니다.
+- 위의 컨트롤 URL를 보면 컬렉션은 /members 입니다.
+- 큰 기능의 단위를 URL로 동사화하여 형식을 맞춘 디렉토리입니다.
+
+#### @ModelAttribute 2가지 특징
+- 생략가능. Item->itm
+- model.addAttribute() 생략가능.
+
+
+
+
 #### 상태경로 vs 절대경로
 
 #### 요청핸들러매핑어댑터
 -> 웹 페이지 만들기 전에 넣어야함.
 #### @RequiredArgsConstructor
 #### @PathVariable
-#### @ModelAttribute 2가지 특징
-- 생략가능. Item->itm
-- model.addAttribute() 생략가능.
+
 ### PRG POST/Redirect/GET
 ### RedirectAttributes
