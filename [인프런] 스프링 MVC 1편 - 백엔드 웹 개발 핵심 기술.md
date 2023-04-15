@@ -943,9 +943,37 @@ public class ControllerTest {
 ```
 
 ### PRG POST/Redirect/GET
+- 현상 : 데이터 등록 후 새로고침 했을 때 중복 등록됨.
+- 원인 : 웹 브라우저의 새로고침은 마지막 버서에 전송한 데이터를 다시 전송합니다.
+- 해결 : 데이터 등록 후 뷰 템플릿으로 이동하는 게 아니라, 상세 화면으로 리다이렉트 호출해주면 됩니다. 
+         상세 화면인 GET /item/{id}가 되는 것으로 새로고침을 해도 상세 화면으로 이동되하게 되므로 해당 현상의 문제를 해결할 수 있습니다.
+
+```java
+    @PostMapping("/add")
+    public String addItemV5(Item item) {
+       itemRepository.save(item);
+       return "redirect:/basic/items/" + item.getId();
+    }
+``` 
+ 
+- URL에 변수를 더하는 것은 URL 인코딩이 안되기 때문에 RedirectAttributes 사용해야합니다.
+- 타입의 문제도 포함. 동적 파라미터가 숫자형인데 문자형으로 리다이렉트 될 수도 있음.
+
+
 ### RedirectAttributes
+- URL인코딩도 해주고, @PathVariable, 쿼리 파라미터까지 처리해줍니다.
+- redirect:/basic/items/{itemId} (pathVariable 바인딩: {itemId} 나머지는 쿼리 파라미터로 처리: ?status=true)
+- RedirectAttributes시 여러값을 추가할 수 있습니다.
 
-
+```java
+    @PostMapping("/add")
+    public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId()); //url 인코딩도 자동으로 해준다.
+        redirectAttributes.addAttribute("status", true); // 상태코드으로 글의 등록여부 확인
+        return "redirect:/basic/items/{itemId}";
+    }    
+``` 
 
 #### 요청핸들러매핑어댑터
 -> 웹 페이지 만들기 전에 넣어야함.
