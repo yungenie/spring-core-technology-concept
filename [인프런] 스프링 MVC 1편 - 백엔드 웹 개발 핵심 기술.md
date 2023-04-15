@@ -869,10 +869,47 @@ public class ControllerTest {
 - 큰 기능의 단위를 URL로 동사화하여 형식을 맞춘 디렉토리입니다.
 
 #### @ModelAttribute 2가지 특징
-- 생략가능. Item->itm
-- model.addAttribute() 생략가능.
+- 요청 파라미터 처리
+	- 객체를 생성하고, 요청 파라미터의 값을 프로퍼티 접근법(setter())로 자동 주입해줍니다.
+	- @ModelAttribute("Name") name 이름을 생략할 수 있습니다.
+		- 이름을 생략하면 모델에 저장할 때 클래스의 첫글자만 소문자로 변경되서 모델에 자동 추가됩니다.
+	- @ModelAttribute 애노테이션 생략도 가능합니다. (HTML FORM 경우에만)
+- Model 추가
+	- Model에 @ModelAttribute로 지정한 객체를 자동으로 넣어줍니다. 
+	- model.addAttribute("Name",VoName); 생략 가능합니다.
 
+    // @RequestParam으로 변수 각각 받아서 객체 셋팅
+    @PostMapping("/add")
+    public String addItemV1(@RequestParam String itemName,
+                       @RequestParam int price,
+                       @RequestParam Integer quantity,
+                       Model model) {
 
+        Item item = new Item();
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+
+        itemRepository.save(item);
+        model.addAttribute("item", item);
+        return "basic/item";
+    }
+    
+    //@ModelAttribute 애노테이션 사용해서 한번에 처리
+    @PostMapping("/add")
+    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
+    
+        itemRepository.save(item);
+        model.addAttribute("item", item); //자동 추가, 생략 가능
+        return "basic/item";
+    }
+
+    // @ModelAttribute, Model 생략
+    @PostMapping("/add")
+    public String addItemV4(Item item) {
+        itemRepository.save(item);
+        return "basic/item";
+    }
 
 
 #### 상태경로 vs 절대경로
