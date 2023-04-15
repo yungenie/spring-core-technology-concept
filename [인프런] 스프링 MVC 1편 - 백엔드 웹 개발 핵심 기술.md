@@ -868,9 +868,27 @@ public class ControllerTest {
 
 
 #### @RequiredArgsConstructor
+- 생성자 의존관계 자동 주입을 해주는 애노테이션입니다.
+- 스프링 빈이 등록된 구현체를(ItemRepository를 구현(@Repository)) 의존성 주입해줍니다.
+- final 붙은 모든 변수의 생성자를 만들어 줍니다.
 
+```java
+public class BasicItemController {
 
+    private final ItemRepository itemRepository;
+	
+    @Autowird // 1개만 있을 때 생략 가능.
+    public BasicItemController(ItemRepository itemRepository) { 
+        this.itemRepository = itemRepository;
+    }
+}
 
+@RequiredArgsConstructor  
+public class BasicItemController {
+
+   private final ItemRepository itemRepository;
+}
+```
 
 
 #### 컨트롤 URL
