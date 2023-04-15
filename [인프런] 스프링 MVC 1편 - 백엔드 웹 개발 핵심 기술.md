@@ -761,7 +761,8 @@ public class RequestParamController {
  - GET/POST HTML Form 요청시 Form data와 VO 객체 바인딩(매핑) 
  - @ModelAttribute 애노테이션 생략 가능
 
-```java
+
+
 @Controller
 public class ControllerTest {
 	
@@ -884,6 +885,7 @@ public class ControllerTest {
 	- Model에 @ModelAttribute로 지정한 객체를 자동으로 넣어줍니다. 
 	- model.addAttribute("Name",VoName); 생략 가능합니다.
 
+```java
     // @RequestParam으로 변수 각각 받아서 객체 셋팅
     @PostMapping("/add")
     public String addItemV1(@RequestParam String itemName,
@@ -916,7 +918,7 @@ public class ControllerTest {
         itemRepository.save(item);
         return "basic/item";
     }
-
+```
 
 #### 상태경로 vs 절대경로
 
