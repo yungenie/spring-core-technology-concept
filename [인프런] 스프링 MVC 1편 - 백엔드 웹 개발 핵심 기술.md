@@ -829,7 +829,13 @@ public class ControllerTest {
 
 - HTTP method [post]는 http message body에 데이터를 담아 서버로 요청 데이터를 전달하는데 핸들러 어댑터의 url 매핑이 안됨.  
 - 즉, 처리하는 컨트롤러가 없기 때문에 에러 페이지가 나왔음.  
-- Get 요청이였다면 해당 url 매핑이 안되더라도 정적 리소스 [resource/static/~] 경로로 처리가 됨.   
+- Get 요청이였다면 해당 url 매핑이 안되더라도 정적 리소스 [src/main/resource/static] 경로로 처리가 됨.   
+
+#### 정적 리소스 경로
+- src/main/resource/static
+- src/main/resource/static/basic/hello-form.html 다음 경로에 파일이 있으면 
+- http://localhost:8080/basic/hello-form.html 웹 브라우저에서 다음과 같이 실행 합니다.
+- 정적 리소스는 파일의 변경 없이 그대로 서비스 하는 것 입니다. (동적 리소스가 아님)
 
 
 ### thymeleaf 템플릿엔진 동작 후 경로
