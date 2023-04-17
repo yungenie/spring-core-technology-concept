@@ -822,6 +822,138 @@ public class ControllerTest {
 #### @Controller & @ResponseBody & return VO
 - json변환해서 나갑니다.
 
+### HTTP 메시지 컨버터
+- @ResponseBody를 사용해서 ```HTTP Body```에 문자 내용을 직접 반환할 때 viewResolver 대신에 HttpMessageConverter가 동작합니다.
+- 기본 문자 처리 : StringHttpMessageConverter
+- 기본 객체 처리 : MappingJackson2HttpMessageConverter
+- 클라이언트의 HTTP Accecpt 해더와 서버의 컨트롤러 반환타입 정보를 조합해서 HttpMessageConverter가 선택됩니다.
+
+#### HTTP 메시지 컨버터 인터페이스
+- 스프링 부트는 다양항 메시지 컨버터를 제공합니다. 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정합니다.
+- canRead(), canWrite() : class와 mediaType을 지원하는 지 체크하는 메소드
+- read(), write() : message 읽고 쓰는 메소드
+
+```java
+/**
+ * Strategy interface for converting from and to HTTP requests and responses.
+ */
+public interface HttpMessageConverter<T> {
+
+	/**
+	 * Indicates whether the given class can be read by this converter.
+	 * @param clazz the class to test for readability
+	 * @param mediaType the media type to read (can be {@code null} if not specified);
+	 * typically the value of a {@code Content-Type} header.
+	 * @return {@code true} if readable; {@code false} otherwise
+	 */
+	boolean canRead(Class<?> clazz, @Nullable MediaType mediaType);
+
+	/**
+	 * Indicates whether the given class can be written by this converter.
+	 * @param clazz the class to test for writability
+	 * @param mediaType the media type to write (can be {@code null} if not specified);
+	 * typically the value of an {@code Accept} header.
+	 * @return {@code true} if writable; {@code false} otherwise
+	 */
+	boolean canWrite(Class<?> clazz, @Nullable MediaType mediaType);
+
+
+	List<MediaType> getSupportedMediaTypes();
+
+	default List<MediaType> getSupportedMediaTypes(Class<?> clazz) {
+		return (canRead(clazz, null) || canWrite(clazz, null) ?
+				getSupportedMediaTypes() : Collections.emptyList());
+	}
+
+	/**
+	 * Read an object of the given type from the given input message, and returns it.
+	 */
+	T read(Class<? extends T> clazz, HttpInputMessage inputMessage)
+			throws IOException, HttpMessageNotReadableException;
+
+	/**
+	 * Write a given object to the given output message.
+	 */
+	void write(T t, @Nullable MediaType contentType, HttpOutputMessage outputMessage)
+			throws IOException, HttpMessageNotWritableException;
+
+}
+```
+
+#### 스프링 부트 기본 메시지 컨버터
+- 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정하고 아래 순서로 만족하지 않으면 다음 메시지 컨버터로 우선순위가 넘어갑니다.
+- 주요 메시지 컨버터
+0 = ByteArrayHttpMessageConverter
+1 = StringHttpMessageConverter
+2 = MappingJackson2HttpMessageConverter
+
+- ByteArrayHttpMessageConverter : byte[] 데이터를 처리한다.
+	- 클래스 타입: byte[] , 미디어타입: */* , 
+	- 요청 예) @RequestBody byte[] data 
+	- 응답 예) @ResponseBody return byte[] 쓰기 미디어타입 application/octet-stream 
+- StringHttpMessageConverter : String 문자로 데이터를 처리한다. 
+	- 클래스 타입: String , 미디어타입: */* 
+	- 요청 예) @RequestBody String data 
+	- 응답 예) @ResponseBody return "ok" 쓰기 미디어타입 text/plain 
+- MappingJackson2HttpMessageConverter : application/json 
+	- 클래스 타입: 객체 또는 HashMap , 미디어타입 application/json 관련 
+	- 요청 예) @RequestBody HelloData data 
+	- 응답 예) @ResponseBody return helloData 쓰기 미디어타입 application/json 관련 
+
+#### HTTP 요청 데이터 읽기
+- HTTP 요청이 오고, 컨트롤러에서 @RequestBody , HttpEntity 파라미터를 사용합니다.
+- 메시지 컨버터가 메시지를 읽을 수 있는지 확인하기 위해 canRead() 를 호출합니다.
+- canRead() 조건을 만족하면 read() 를 호출해서 객체 생성하고, 반환합니다.
+- canRead() 조건 :
+	- 대상 클래스 타입을 지원하는 지?   
+	  예) @RequestBody 의 대상 클래스 ( byte[] , String , HelloData )    
+	- ```HTTP 요청의 Content-Type``` 미디어 타입을 지원하는 지?   
+  	  예) text/plain , application/json , */*   
+
+
+#### HTTP 응답 데이터 생성
+- 컨트롤러에서 @ResponseBody, HttpEntity로 값이 변환됩니다.
+- 메시지 컨버터가 메시지를 쓸 수 있는 지 확인하기 위해 canWrite()를 호출합니다.
+- canWrite() 조건을 만족하면 write() 호출해서 HTTP 응답 메시지 바디에 데이터를 생성합니다.
+- canWrite() 조건 : 
+	- 대상 클래스 타입을 지원하는 지?    
+	  예) return의 대상 클래스 ( byte[] , String , HelloData )
+	- ```HTTP 요청의 Accept```미디어 타입을 지원하는가.(더 정확히는
+	  예) text/plain , application/json , */*
+
+
+#### HTTP 메시지 컨버터 위치
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232447149-126b636e-ef8b-4416-9769-5a852a105a74.png">
+
+
+
+
+
+### 요청 매핑 핸들러 어댑터 구조
+- Spring MVC 구조
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443524-74b40fb0-2bf2-48b5-aa3d-095902c5181a.png">
+
+- RequestMappingHandlerAdapter 동작방식
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443620-0d615fec-3aaa-45cb-9b16-48a4d632e9b1.png">
+
+#### ArgumentResolver (요청처리)
+- 애노테이션 기반의 컨트롤러는 매우 다양한 파라미터를 사용할 수 있었다.
+- HttpServletRequest, Model, @RequestParam , @ModelAttribute, @RequestBody, HttpEntity 같은 HTTP 메시지를 처리하는 부분까지 파라미터를 유연하게 처리할 수 있는 이유가 바로 ArgumentResolver 덕분이다.
+- ```동작원리``` : 애노테이션 기반 컨트롤러를 처리하는 RequestMappingHandlerAdapter가 ArgumentResolver 호출해서 컨트롤러(핸들러)가 필요로 하는 **다양한 파라미터의 값(객체)를 생성**합니다. 그 후 컨트롤러를 호출하면서 값을 넘겨줍니다.  
+
+#### ArgumentResolver -> HTTP 메시지 컨버터(오청)
+- @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있습니다.
+- 이 ArgumentResolver들이 HTTP 메시지 컨버터를 사용해서 ```필요한 객체를 생성```하는 것이다.
+
+#### ReturnValueHandler (응답처리)
+- HandlerMethodReturnValueHandler를 줄여서 ReturnValueHandler라 부른다. ArgumentResolver 와 비슷한데, 이것은 응답 값을 변환하고 처리한다.
+- 컨트롤러에서 String으로 뷰 이름을 반환해도, 동작하는 이유가 바로 ReturnValueHandler 덕분이다.
+- 스프링은 10여개가 넘는 ReturnValueHandler 를 지원한다. 예) ModelAndView , @ResponseBody , HttpEntity , String
+
+#### ReturnValueHandler -> HTTP 메시지 컨버터(응답)
+- @ResponseBody와 HttpEntity를 처리하는 ReturnValueHandler가 있습니다. HTTP 메시지 컨버터를 호출해서 ```응답 결과```를 만듭니다.
+
+
 ## 웹 페이지 만들기
 - IntelliJ 기본 설정 
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/231683597-601d1af2-35b9-4808-9579-b7b033c5cf91.png">
@@ -1003,8 +1135,30 @@ public class BasicItemController {
         return "redirect:/basic/items/{itemId}";
     }    
 ``` 
-
-#### 요청핸들러매핑어댑터
--> 웹 페이지 만들기 전에 넣어야함.
-
-
+# 총 요약 정리
+## @RequestParam, @ModelAttribute, @RequestBody, @ResponseBody
+> - 쿼리 파라미터 (@RequestParam)
+> - HTML FORM (@ModelAttribute)
+> - 단순 텍스트
+> - API JSON (@RequestBody)
+> 
+## ViewResolver, HttpMessageConverter
+> - ViewResolver는 단순 뷰로 반환
+> - HttpMessageConverter는 HTTP Body 데이터를 담아서 반환할 때
+>  
+## Spring MVC 구조 (RequestMappingHandlerAdapter, HTTP Message Converter)
+> 1. HTTP 메시지를 처리해서 요청 데이터 생성
+> - ArgumentResolver : @RequestBody, HttpEntity
+> - HTTP 메시지 컨버터 : 필요한 객체 생성
+> 
+> 2. controller 호출
+> 
+> 3. 응답 데이터를 HTTP 메시지에 입력
+> - ReturnValeuHandler: @ResponseBody, HttpEntity
+> - HTTP 메시지 컨버터 : 응답 데이터 생성
+> 
+## ArgumentResolver
+> - @RequestParam, Model, @RequestBody, HttpEntity
+> 
+## ReturnValueHandler
+> - @ModelAttribute, Model, @ResponseBody, HttpEntity, String
