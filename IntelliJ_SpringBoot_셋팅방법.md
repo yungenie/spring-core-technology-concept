@@ -1,6 +1,7 @@
 # IntelliJ Spring Boot 셋팅방법
 ## 프로젝트 생성
 -  스프링 부트 스타터 [`사이트`](https://start.spring.io)로 이동해서 스프링 프로젝트 생성
+-  ※ 프로젝트 환경에 맞게 설정
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230826207-329059dd-f241-4926-96a2-2228097370a6.png">
 
 ## IntelliJ Build And Run 설정
