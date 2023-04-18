@@ -88,3 +88,106 @@ public class BasicController {
 #### 비교 결과
 <img width="279" alt="image" src="https://user-images.githubusercontent.com/28051638/232420004-101e03fa-c175-480f-b40b-30f2810bb80f.png">
 
+### 변수 SpringEL
+-  jsp에서의 jstl 문법과 비슷합니다.
+
+```java
+    @GetMapping("/variable")
+    public String variable(Model model) {
+        User userA = new User("yunjin", 10);
+        User userB = new User("younggeun", 20);
+
+        List<User> list = new ArrayList<>();
+        list.add(userA);
+        list.add(userB);
+
+        Map<String, User> map = new HashMap<>();
+        map.put("userA", userA);
+        map.put("userB", userB);
+
+        model.addAttribute("user", userA);
+        model.addAttribute("users", list);
+        model.addAttribute("userMap", map);
+
+        return "basic/variable";
+    }
+```
+
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>SpringEL 표현식</h1>
+<ul>Object
+    <li>${user.username} =    <span th:text="${user.username}"></span></li>
+    <li>${user['username']} = <span th:text="${user['username']}"></span></li>
+    <li>${user.getUsername()} = <span th:text="${user.getUsername()}"></span></li>
+</ul>
+<ul>List
+    <li>${users[0].username}    = <span th:text="${users[0].username}"></span></li>
+    <li>${users[0]['username']} = <span th:text="${users[0]['username']}"></span></li>
+    <li>${users[0].getUsername()} = <span th:text="${users[0].getUsername()}"></span></li>
+</ul>
+
+List for each
+<ul th:each="user : ${users}">
+    <li>${user.username}    = <span th:text="${user.username}"></span></li>
+    <li>${user.age}    = <span th:text="${user.age}"></span></li>
+</ul>
+
+
+<ul>Map
+    <li>${userMap['userA'].username} =  <span th:text="${userMap['userA'].username}"></span></li>
+    <li>${userMap['userA']['username']} = <span th:text="${userMap['userA']['username']}"></span></li>
+    <li>${userMap['userA'].getUsername()} = <span th:text="${userMap['userA'].getUsername()}"></span></li>
+</ul>
+
+Map for each
+<ul th:each="usermaplist : ${userMap}">
+    <li th:each="list : ${usermaplist.value}">
+        <span th:text="${list.username}"></span>
+        <span th:text="${list.age}"></span>
+    </li>
+</ul>
+
+<h1>지역 변수 - (th:with)</h1>
+<div th:with="first=${users[0]}">
+    <p>처음 사람의 이름은 <span th:text="${first.username}"></span></p>
+</div>
+
+</body>
+</html>
+```
+
+- 결과
+```
+    SpringEL 표현식
+    Object
+    ${user.username} = yunjin
+    ${user['username']} = yunjin
+    ${user.getUsername()} = yunjin
+    List
+    ${users[0].username} = yunjin
+    ${users[0]['username']} = yunjin
+    ${users[0].getUsername()} = yunjin
+    List for each
+    ${user.username} = yunjin
+    ${user.age} = 10
+    ${user.username} = younggeun
+    ${user.age} = 20
+    Map
+    ${userMap['userA'].username} = yunjin
+    ${userMap['userA']['username']} = yunjin
+    ${userMap['userA'].getUsername()} = yunjin
+    Map for each
+    yunjin 10
+    younggeun 20
+    지역 변수 - (th:with)
+    처음 사람의 이름은 yunjin
+```
+
