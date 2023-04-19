@@ -140,7 +140,23 @@ List for each
     <li>${user.age}    = <span th:text="${user.age}"></span></li>
 </ul>
 
-
+반복 상태 유지 지정한 변수명 + Stat (userStat 생략도 가능)
+  <tr th:each="user, userStat : ${users}">
+    <td th:text="${userStat.count}">username</td>
+    <td th:text="${user.username}">username</td>
+    <td th:text="${user.age}">0</td>
+    <td>
+      index = <span th:text="${userStat.index}"></span>
+      count = <span th:text="${userStat.count}"></span>
+      size = <span th:text="${userStat.size}"></span>
+      even? = <span th:text="${userStat.even}"></span>
+      odd? = <span th:text="${userStat.odd}"></span>
+      first? = <span th:text="${userStat.first}"></span>
+      last? = <span th:text="${userStat.last}"></span>
+      current = <span th:text="${userStat.current}"></span>
+    </td>
+  </tr>
+    
 <ul>Map
     <li>${userMap['userA'].username} =  <span th:text="${userMap['userA'].username}"></span></li>
     <li>${userMap['userA']['username']} = <span th:text="${userMap['userA']['username']}"></span></li>
