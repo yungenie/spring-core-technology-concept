@@ -79,6 +79,7 @@ public class BasicController {
 - HTML에서 사용하는 특수 문자를 HTML 엔티티로 변경하는 것을 이스케이프(escape)라고 합니다.
 - 타임리프가 제공하는 th:text, [[...]] 는 기본적으로 이스케이스(escape)를 제공합니다.
 - ```예)``` 뒷단에서 태그를 생성해서 뷰로 보내면 데이터가 렌더링 되는 게 아니고 특수문자를 통해서 문자열태그가 만들어 집니다. < - &lt; > - &gt;
+- 비교연산 ```> (gt), < (lt), >= (ge), <= (le), ! (not), == (eq), != (neq, ne)```
 
 #### Unescape
 - 이스케이프(escape) 기능을 사용하지 않으려면 어떻게 해야할까요?
@@ -87,6 +88,7 @@ public class BasicController {
 
 #### 비교 결과
 <img width="279" alt="image" src="https://user-images.githubusercontent.com/28051638/232420004-101e03fa-c175-480f-b40b-30f2810bb80f.png">
+
 
 ### 변수 SpringEL
 -  jsp에서의 jstl 문법과 비슷합니다.
