@@ -190,4 +190,33 @@ Map for each
     지역 변수 - (th:with)
     처음 사람의 이름은 yunjin
 ```
+### 리터럴 literals
+- 리터럴은 소스 코드 상에 고정된 값을 말하는 용어 입니다.
+- 문자 : 'value'
+- 숫자 : 10
+- 논리 : true, false
+- null : null
+- 타임리프에서 리터럴은 '(작은 따옴표)로 감싸야 합니다.
+- 리터럴 대체 문법 th:text="|text ${value}|" ||를 사용해서 '(작은 따옴표) 대신 사용할 수 있습니다.
 
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>리터럴</h1>
+<ul>
+    <!--주의! 다음 주석을 풀면 예외가 발생함-->
+    <!--    <li>"hello world!" = <span th:text="hello world!"></span></li>-->
+    <li>'hello' + ' world!' = <span th:text="'hello' + ' world!'"></span></li>
+    <li>'hello world!' = <span th:text="'hello world!'"></span></li>
+    <li>'hello ' + ${data} = <span th:text="'hello ' + ${data}"></span></li>
+    <li>리터럴 대체 |hello ${data}| = <span th:text="|hello ${data}|"></span></li>
+</ul>
+
+</body>
+</html>
+```
