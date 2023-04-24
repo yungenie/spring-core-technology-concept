@@ -247,3 +247,80 @@ Map for each
 <h1>타임리프 파서 주석</h1>
 <!--/* [[${data}]] */-->
 ```
+
+## 타임리프 스프링 통합과 폼
+- 스프링에서 타임리프는 기본적으로 html을 지원해줍니다.
+- 변경을 원하면 application.properties 설정 파일에서 spring.thymeleaf.suffix 속성을 수정해줍니다.
+
+### 타임리프 - 입력 폼 처리
+- th:object를 적용하려면 먼저 해당 오브젝트 정보를 컨트롤러단에서 넘겨줘야 합니다. 
+- 넘겨받은 오브젝트 Key 값으로 ${key.객체속성} 대신에 ```th:field="*{객체속성}"```를 사용해서 매핑할 수 있습니다.
+- th:field는 name을 자동으로 추가해줍니다. (domain(vo)와 일치하는 속성을 th:field에 매)
+
+```html
+    <form action="item.html" th:action th:object="${item}" method="post">
+        <div>
+            <label for="itemName">상품명</label>
+            <input type="text" id="itemName" th:field="*{itemName}" class="form-control" placeholder="이름을 입력하세요">
+        </div>
+        <div>
+            <label for="price">가격</label>
+            <input type="text" id="price" th:field="*{price}" class="form-control" placeholder="가격을 입력하세요">
+        </div>
+        <div>
+            <label for="quantity">수량</label>
+            <input type="text" id="quantity" th:field="*{quantity}" class="form-control" placeholder="수량을 입력하세요">
+        </div>
+    </form>
+
+```
+
+#### 타임리프 - 체크 박스
+- 체크박스는 값이 선택되지 않을 때 false가 아닌 null로 넘어오는 이슈가 있어 타임리프를 사용하면 **히든 필드를 자동으로 생성**해줍니다.
+- 체크박스는 단일/멀티(여러개 선택 가능) 2가지 종류로 사용할 수 있고, 단일/멀티 둘다 선택하지 않아도 됩니다.
+
+```html
+<!-- 타임리프 적용 전 -->
+<input type="checkbox" id="open" name="open" class="form-check-input">
+<input type="checkbox" name="_open" value="on"/>
+
+<!-- 타임리프 적용 후 -->
+<input type="checkbox" id="open" th:field="*{open}" class="form-check-input">
+```
+#### 타임리프 - 라디오 버튼
+- 라디오 버튼은 멀티 선택이 안됩니다. 한번 선택하면 다른 라디오 버튼을 선택해서 취소 해야 합니다.
+- 멀티 체크박스는 같은 이름의 여러 체크박스를 만들 수 있습니다. HTML 태그 속성에 **name은 같아도 되지만, id 값은 달라**야 합니다.
+- 따라서 체크박스를 each 루프 안에서 반복해서 만들 때 임의로 1, 2, 3 숫자를 붙여 줄 수 있습니다.
+- ```th:for="${#ids.prev('itemType')}"``` 를 사용하면 id="itemType1", id="itemType2", id="itemType3" 동적으로 생성되는 id 값을 사용할 수 있습니다.
+
+```html
+<div>
+     <div>상품 종류</div>
+     <div th:each="type : ${itemTypes}" class="form-check form-check-inline">
+         <input type="radio" th:field="*{itemType}" th:value="${type.name()}" class="form-check-input">
+         <label th:for="${#ids.prev('itemType')}" th:text="${type.description}" class="form-check-label">
+             BOOK
+         </label>
+     </div>
+</div>
+```        
+        
+        
+
+#### 타임리프 - 셀렉트 박스
+- @ModelAttribute 객체가 담긴 key 값을 사용해서 옵션의 글과 값을 셋팅할 수 있습니다.
+
+
+```html
+<div>
+    <div>배송 방식</div>
+    <select th:field="*{deliveryCode}" class="form-select">
+        <option value="">==배송 방식 선택==</option>
+        <option th:each="deliveryCode : ${deliveryCodes}" th:value="${deliveryCode.code}"
+                th:text="${deliveryCode.displayName}">FAST</option>
+    </select>
+</div>
+```
+
+
+
