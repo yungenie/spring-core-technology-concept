@@ -321,6 +321,37 @@ Map for each
     </select>
 </div>
 ```
+## 메시지, 국제화
+### 메시지
+- 여러 HTML 파일에 하드코딩 되어 있는 label 단어를 관리할 수 있습니다.
+- 다양한 메시지를 하나의 설정 파일에서 관리하도록 하는 기능을 메시지 기능이라 합니다.
+- messages.properties 라는 메시지 관리용 파일을 만들고 변수에 단어를 설정합니다.
+
+```  
+- messages.properties
+item=상품
+item.id=상품 ID
+item.itemName=상품명
+item.price=가격
+item.quantity=수량
+
+- html
+<label for="itemName" th:text="#{item.itemName}"></label>
+```  
+
+### 국제화
+- messages.properties을 각 나라별로 별도로 관리하면 서비스를 국제화 할 수 있습니다.
+
+```  
+messages.properties :기본 값으로 사용(한글)
+messages_en.properties : 영어 국제화 사용
+```  
+
+> 스프링은 기본적인 메시지와 국제화 기능을 모두 제공한다. 그리고 타임리프도 스프링이 제공하는 메시지와 국제화 기능을 편리하게 통합해서 제공합니다.
+
+### 국제화가 아닌 사용자가 언어 선택을 하게 할 때
+- 한국에서 접근한 것인지 영어에서 접근한 것인지는 인식하는 방법은 HTTP accept-language 해더 값을 사용하거나 사용자가 직접 언어를 선택하도록 하고, 쿠키 등을 사용해서 처리하면 된다.
+- 그러므로, 사용자가 언어를 선택하게 해서 쿠키나 세션에 언어설정 값을 넣어놓고 사용할 수 있도록 할 수도 있다.
 
 
 
