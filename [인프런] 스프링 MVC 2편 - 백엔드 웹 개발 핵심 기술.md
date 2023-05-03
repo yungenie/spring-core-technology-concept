@@ -340,7 +340,7 @@ item.quantity=수량
 ```  
 
 ### 국제화
-- messages.properties을 각 나라별로 별도로 관리하면 서비스를 국제화 할 수 있습니다.
+- messages.properties을 각 나라별로 별도로 관리하면 서비스를 국제화 할 수 있습니다. (Local에 맞춰서 파일명 변경)
 
 ```  
 messages.properties :기본 값으로 사용(한글)
