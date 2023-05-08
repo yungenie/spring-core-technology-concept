@@ -355,7 +355,8 @@ messages_en.properties : 영어 국제화 사용
 
 ### 검증1 - Validation
 
-#### 검증 v1 직접처리
+#### 검증 v1 - 직접처리
+##### 검증에 대해서 조건문으로 처리
 ```html
 <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
 <input type="text" id="itemName" th:field="*{itemName}" th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'" class="form-control" placeholder="이름을 입력하세요">
@@ -372,7 +373,9 @@ messages_en.properties : 영어 국제화 사용
 3) map의 value를 가져올 때 ${errors['key']} 
 
 
-#### 검증 v2 BindingResult1 
+#### 검증 v2 - BindingResult1
+##### 검증에 대해서 스프링과 타임리프 통합으로 제공해주는 BindingResult객체로 처리
+
 ```java
  @PostMapping("/add")
     public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
@@ -411,7 +414,7 @@ messages_en.properties : 영어 국제화 사용
         return "redirect:/validation/v2/items/{itemId}";
     }
 ```
-- BindingResult는 스프링이 제공하는 검증 오류를 보관하는 객체 입니다.
+- BindingResult는 스프링이 제공하는 `검증 오류를 보관하는 객체` 입니다.
 - BindingResult 파라미터는 **@ModelAttribute 다음 순서**에 위치해야 한다. 
 - BindingResult는 model에 담지 않아도 자동으로 view로 넘어간다.
 
