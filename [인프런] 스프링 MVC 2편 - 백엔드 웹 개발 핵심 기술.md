@@ -411,6 +411,7 @@ messages_en.properties : 영어 국제화 사용
         return "redirect:/validation/v2/items/{itemId}";
     }
 ```
+- BindingResult는 스프링이 제공하는 검증 오류를 보관하는 객체 입니다.
 - BindingResult 파라미터는 **@ModelAttribute 다음 순서**에 위치해야 한다. 
 - BindingResult는 model에 담지 않아도 자동으로 view로 넘어간다.
 
