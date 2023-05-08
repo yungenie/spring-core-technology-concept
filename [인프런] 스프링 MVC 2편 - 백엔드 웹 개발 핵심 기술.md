@@ -491,3 +491,64 @@ messages_en.properties : 영어 국제화 사용
     - th:errorclass : th:field에서 지정한 필드에 오류가 있으면 class 정보를 추가합니다. (객체 속성의 에러가 발생하면 class 속성 추가)
 
 > BindingResult의 오류 처리는 2가지 존재합니다. 첫번째는 바인딩 실패(타입 미스매치), 두번째는 비지니스 로직 검증 체크로 크게 나눌 수 있습니다.
+
+#### FieldError, ObjectError
+##### FieldError 객체는 오류 발생시 사용자 입력 값을 저장하는 기능을 제공합니다.
+
+```java
+@PostMapping("/add")
+    public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        /* FieldError 객체는 오류가 발생한 경우 사용자 입력 값을 보관해줍니다.
+        FieldError(objectName, field, rejectedValue, bindingFailure, codes, arguments, defaultMessage)
+        objectName : 오류가 발생한 객체 이름
+        field : 오류 필드
+        rejectedValue : 사용자가 입력한 값(거절된 값)
+        bindingFailure : 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
+        codes : 메시지 코드
+        arguments : 메시지에서 사용하는 인자
+        defaultMessage : 기본 오류 메시지
+        */
+
+        //검증 로직
+        if (!StringUtils.hasText(item.getItemName())) {
+            bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수 입니다."));
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            bindingResult.addError(new FieldError("item", "quantity", item.getQuantity(), false, null ,null, "수량은 최대 9,999 까지 허용합니다."));
+        }
+
+        //특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.addError(new ObjectError("item",null ,null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+            }
+        }
+
+        //검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors={} ", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+```
+
+##### 타임리프의 사용자 입력 값 유지
+- 오류가 발생하면 위의 FieldError 객체에서 보관한 값을 출력합니다.
+```html
+<label for="quantity" th:text="#{label.item.quantity}">수량</label>
+            <input type="text" id="quantity" th:field="*{quantity}"
+                   th:errorclass="field-error" class="form-control" placeholder="수량을 입력하세요">
+            <div class="field-error" th:errors="*{quantity}">
+                수량 오류
+            </div>
+```
