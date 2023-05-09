@@ -556,3 +556,116 @@ messages_en.properties : 영어 국제화 사용
 > 타입 오류로 바인딩에 실패하면 스프링은 FieldError 를 생성하면서 사용자가 입력한 값을 넣어둡니다.
 > 그리고 해당 오류를 BindingResult 에 담아서 컨트롤러를 호출하고, 타입 오류 같은 바인딩 실패시에도 사용자의 오류 메시지를 정상 출력할 수 있습니다.
 > 그러므로 BindingResult는 스프링의 바인딩 오류 처리를 효율적으로 처리해줍니다.
+
+
+
+### 오류 코드와 메시지 처리1
+
+- errors 에 등록한 메시지를 사용해서 처리할 수 있다.
+
+#### [application.properties](http://application.properties) 설정
+
+→ spring.messages.basename=messages,errors
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/462e18ec-97b7-4280-8f9b-0d3f905f9ca2/Untitled.png)
+
+#### [errors.properties](http://errors.properties) 설정
+
+```
+required.default= 필수로 입력해주세요.
+required.item.itemName=상품 이름은 필수입니다.
+range.item.price=가격은 {0} ~ {1} 까지 허용합니다.
+max.item.quantity=수량은 최대 {0} 까지 허용합니다.
+totalPriceMin=가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}
+```
+
+```java
+public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    /* FieldError 객체는 오류가 발생한 경우 사용자 입력 값을 보관해줍니다.
+    FieldError(objectName, field, rejectedValue, bindingFailure, codes, arguments, defaultMessage)
+    objectName : 오류가 발생한 객체 이름
+    field : 오류 필드
+    rejectedValue : 사용자가 입력한 값(거절된 값)
+    bindingFailure : 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
+    codes : 메시지 코드 (errors.properties)
+    arguments : 메시지에서 사용하는 인자
+    defaultMessage : 기본 오류 메시지
+    */
+
+    //검증 로직
+    if (!StringUtils.hasText(item.getItemName())) {
+        bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, new String[]{"required.item.itemName", "required.default"}, null, null));
+    }
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, new String[]{"range.item.price"}, new Object[]{1000, 1000000}, null));
+    }
+    if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+        bindingResult.addError(new FieldError("item", "quantity", item.getQuantity(), false, new String[]{"max.item.quantity"} ,new Object[]{9999}, null));
+    }
+
+    //특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.addError(new ObjectError("item",new String[]{"totalPriceMin"} ,new Object[]{10000, resultPrice}, null));
+        }
+    }
+
+    //검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+log.info("errors={} ", bindingResult);
+        return "validation/v2/addForm";
+    }
+
+    //성공 로직
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+
+```
+
+### 오류 코드와 메시지 처리2
+
+- bindingResult.FieldError()를 직접 다룰 때는 오류 코드를 range.item.price 정의한 코드를 모두 입력했다. bindingResult.rejectValue()를 사용해서 축약된 오류 코드를 사용할 수 있다. (범용성으로 간단하게 작성할 때)
+
+```java
+public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+log.info("objectName={}", bindingResult.getObjectName());
+log.info("target={}", bindingResult.getTarget());
+
+    if (!StringUtils.hasText(item.getItemName())) {
+        bindingResult.rejectValue("itemName", "required");
+    }
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        bindingResult.rejectValue("price", "range", new Object[]{1000, 10000000}, null);
+    }
+    if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+        bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+    }
+
+    //특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+        }
+    }
+
+    //검증에 실패하면 다시 입력 폼으로
+    if (bindingResult.hasErrors()) {
+log.info("errors={} ", bindingResult);
+        return "validation/v2/addForm";
+    }
+
+    //성공 로직
+    Item savedItem = itemRepository.save(item);
+    redirectAttributes.addAttribute("itemId", savedItem.getId());
+    redirectAttributes.addAttribute("status", true);
+    return "redirect:/validation/v2/items/{itemId}";
+}
+```
+
+### 오류 코드와 메시지 처리3
+
+- 처리2는 범용적으로 간단하게 작성할 때 좋다. 세밀하게 작성해야 할 때는 메시지에 단계를 두고 사용하면 된다.
