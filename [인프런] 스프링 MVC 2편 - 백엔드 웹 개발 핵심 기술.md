@@ -357,6 +357,53 @@ messages_en.properties : 영어 국제화 사용
 
 #### 검증 v1 - 직접처리
 ##### 검증에 대해서 조건문으로 처리
+- 검증시 오류가 발생하면 어떤 검증에서 오류가 발생했는 지 Map자료구조에 정보(필드, 에러문구)를 담아 타임리프를 이용해 처리함.
+
+```java
+ @PostMapping("/add")
+    public String addItem(@ModelAttribute Item item, RedirectAttributes redirectAttributes, Model model) {
+        
+        //model.addAttribute("item", item); // 자동으로 추가해줌.
+        //검증에 실패했을 때 재사용 가능하게끔 - 입력했던 값 그대로 다시 화면에 노출 (데이터형에 해당할 떄)
+
+        //검증 오류 결과를 보관
+        Map<String, String> errors = new HashMap<>();
+
+        //검증 로직
+        if (StringUtils.hasText(item.getItemName())) {
+            errors.put("itemName", "상품 이름은 필수입니다.");
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            errors.put("price", "가격은 1,000 ~ 1,000,000 까지 허용합니다.");
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            errors.put("quantity", "수량은 최대 9,999 까지 허용합니다.");
+        }
+
+        //특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                errors.put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice);
+            }
+        }
+
+        //검증에 실패하면 다시 입력 폼으로
+        if (hasError(errors)) {
+            log.info("errors = {} ", errors);
+            model.addAttribute("errors", errors); // 착각함. model.addAttribute(key, value) map 형태로 요청한 data이미 model에 담겨져 있음.
+            return "validation/v1/addForm";
+        }
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v1/items/{itemId}";
+    }
+```
+
+
 ```html
 <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
 <input type="text" id="itemName" th:field="*{itemName}" th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'" class="form-control" placeholder="이름을 입력하세요">
