@@ -409,7 +409,7 @@ messages_en.properties : 영어 국제화 사용
 <input type="text" id="itemName" th:field="*{itemName}" th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' : 'form-control'" class="form-control" placeholder="이름을 입력하세요">
 <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">상품명 오류</div>
             
-->
+-> 변경 
 <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
 <input type="text" id="itemName" th:field="*{itemName}" th:classappend="${error?.containsKey('itemName')} ? 'field-error' : _ " class="form-control" placeholder="이름을 입력하세요">
 <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">상품명 오류</div>
