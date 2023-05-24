@@ -486,6 +486,10 @@ messages_en.properties : 영어 국제화 사용
 - `도메인에 바인딩된 결과`가 담겨 BindingResult 파라미터는 **@ModelAttribute 다음 순서에 위치**해야 합니다. 순서가 중요합니다.
 - BindingResult는 model에 담지 않아도 자동으로 view에 같이 넘어간다.
 
+##### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/51b8d55c-dc25-4fd7-acc8-bdb8f9630523">
+
+
 ##### BindingResult 문제점
 - 고객이 입력한 문자가 사라지고, 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
 - 고객이 입력한 값도 어딘가에 별도로 관리가 되어야 한다.
