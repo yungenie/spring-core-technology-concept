@@ -482,7 +482,8 @@ messages_en.properties : 영어 국제화 사용
     }
 ```
 - BindingResult는 스프링이 제공하는 `검증 오류를 보관하는 객체` 입니다.
-- BindingResult가 있으면 @ModelAttribute에 데이터 바인딩 오류가 발생해도 BindingResult에 FieldError/ObjectError를 담아서 컨트롤러를 정상 호출합니다.
+- BindingResult, FieldError, ObjectError를 사용해서 오류 메시지를 처리합니다.
+- BindingResult가 있으면 @ModelAttribute에 **데이터 바인딩 오류가 발생해도 BindingResult에 FieldError/ObjectError를 담아서 컨트롤러를 정상 호출**합니다.
 - 도메인에 바인딩된 결과가 담겨 BindingResult 파라미터는 **@ModelAttribute 다음 순서에 위치**해야 합니다. 순서가 중요합니다.
 - BindingResult는 model에 담지 않아도 자동으로 view에 같이 넘어간다.
 
@@ -497,15 +498,17 @@ messages_en.properties : 영어 국제화 사용
 
         <div th:if="${#fields.hasGlobalErrors()}">
             <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">글로벌 오류 메시지</p>
-        </div> <!--th:each="err : ${#fields.globalErrors()}" : 오류가 담긴 컬렉션이 each 돌면서 모두 출력 -->
-
+        </div>
+        <!--/* th:each="err : ${#fields.globalErrors()}" : 오류가 담긴 컬렉션이 each 돌면서 모두 출력 */-->
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
             <input type="text" id="itemName" th:field="*{itemName}"
-                   th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요"> <!--th:field="*{itemName}" : 해당 필드에 해당하는 오류가 있으면 뒤에 에러태그들 작동 th:errorclass="field-error" : 에러가 나면 적용, 안나면 적용 안함-->
-            <div class="field-error" th:errors="*{itemName}"> <!--th:errors="*{itemName}" : 에러가 있으면 출력, 없으면 출력 안함-->
-                상품명 오류
+                   th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요">
+            <div class="field-error" th:errors="*{itemName}">
+                상품명 오류22
             </div>
+            <!--/* th:errors="*{itemName}" : 에러가 있으면 출력, 없으면 출력 안함 */-->
+            <!--/* th:field="*{itemName}" : 해당 필드에 해당하는 오류가 있으면 뒤에 에러태그들 작동 th:errorclass="field-error" : 에러가 나면 적용, 안나면 적용 안함 */-->
         </div>
         <div>
             <label for="price" th:text="#{label.item.price}">가격</label>
@@ -555,17 +558,13 @@ messages_en.properties : 영어 국제화 사용
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/51b8d55c-dc25-4fd7-acc8-bdb8f9630523">
 
 ##### BindingResult 문제점
-- 고객이 입력한 문자가 사라지고, 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/32e234c0-bb6a-4980-8f51-667af67cb993">
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/1dcca045-1c87-4c57-bc79-a4c3e8d0fb01">
+- BindingResult를 적용해서 타입오류로 바인딩 실패에 대한 에러내용과 해당 입력문자는 유지되도록 수정을 했습니다.
+- 그러나, 타입 오류가 아닌 검증 오류 발생 시 고객이 입력한 문자가 사라지고 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
 - 고객이 입력한 값도 어딘가에 별도로 관리가 되어야 한다.
 
-> BindingResult, FieldError, ObjectError를 사용해서 오류 메시지를 처리하는 
-> BindingResult의 오류 처리는 2가지 존재합니다. 첫번째는 바인딩 실패(타입 미스매치), 두번째는 비지니스 로직 검증 체크로 크게 나눌 수 있습니다.
-
-
-
-
-
-
+> 정리, BindingResult의 오류 처리는 2가지 존재합니다. 첫번째는 바인딩 실패(타입 미스매치), 두번째는 비지니스 로직 검증 체크로 크게 나눌 수 있습니다. 또한 바인딩 실패한 입력 데이터만 유지하는 게 아닌, 로직 검증 실패에 대해서도 데이터 유지를 해야합니다.
 
 
 #### FieldError, ObjectError
