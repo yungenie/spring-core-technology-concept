@@ -590,7 +590,7 @@ messages_en.properties : 영어 국제화 사용
 
 ```java
     /**
-     * 검증v2 (FieldError, ObjectError)
+     * 검증v2 (FieldError, rejectedValue)
      * - 오류 발생시 사용자 입력 값이 유지되도록 처리 합니다. (데이터 보존)
      */
     @PostMapping("/add")
