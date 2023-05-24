@@ -252,6 +252,8 @@ Map for each
 <!--/* [[${data}]] */-->
 ```
 
+<br>
+
 ## 타임리프 스프링 통합과 폼
 - 스프링에서 타임리프는 기본적으로 html을 지원해줍니다.
 - 변경을 원하면 application.properties 설정 파일에서 spring.thymeleaf.suffix 속성을 수정해줍니다.
