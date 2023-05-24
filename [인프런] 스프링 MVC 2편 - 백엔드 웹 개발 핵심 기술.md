@@ -360,7 +360,12 @@ messages_en.properties : 영어 국제화 사용
 - 검증시 오류가 발생하면 어떤 검증에서 오류가 발생했는 지 Map자료구조에 정보(필드, 에러문구)를 담아 타임리프를 이용해 처리함.
 
 ```java
- @PostMapping("/add")
+     /**
+     * 검증V1 (검증 직접 처리)
+     * - 검증시 오류가 발생하면 어떤 검증에서 오류가 발생했는 지 Map자료구조에 정보(필드,에러문구)를 담아 타임리프를 이용해 처리를 함.
+     * - 문제점 : 타입오류 처리가 안되기 때문에 타입오류된 고객의 입력 데이터는 관리되지 않는다.
+     */
+    @PostMapping("/add")
     public String addItem(@ModelAttribute Item item, RedirectAttributes redirectAttributes, Model model) {
         
         //model.addAttribute("item", item); // 자동으로 추가해줌.
@@ -430,11 +435,15 @@ messages_en.properties : 영어 국제화 사용
 ##### 검증에 대해서 스프링과 타임리프 통합으로 제공해주는 BindingResult객체로 처리
 
 ```java
- @PostMapping("/add")
-    public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        // BindingResult 파라미터는 @ModelAttribute 다음 순서에 위치해야 한다.
+    /**
+     * 검증v2 (BindingResult1)
+     *
+     */
+    @PostMapping("/add")
+    public String addItem(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        // BindingResult는 도메인에 바인딩된 결과가 담깁니다. @ModelAttribute 다음 순서에 위치해야 한다.
 
-        //검증 로직
+        //검증 로직 (필드 에러 처리 - FieldError())
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수 입니다."));
         }
@@ -445,7 +454,7 @@ messages_en.properties : 영어 국제화 사용
             bindingResult.addError(new FieldError("item", "quantity", "수량은 최대 9,999 까지 허용합니다."));
         }
 
-        //특정 필드가 아닌 복합 룰 검증
+        //특정 필드가 아닌 복합 룰 검증 (글로벌 에러 처리 - ObjectError)
         if (item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
             if (resultPrice < 10000) {
@@ -456,7 +465,7 @@ messages_en.properties : 영어 국제화 사용
         //검증에 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
             log.info("errors={} ", bindingResult);
-            //model.addAttribute("errors", errors); //bindingResult는 자동으로 view에 넘어간다.
+            //model.addAttribute("errors", errors); //bindingResult는 자동으로 view에 같이 넘어간다.
             return "validation/v2/addForm";
         }
 
