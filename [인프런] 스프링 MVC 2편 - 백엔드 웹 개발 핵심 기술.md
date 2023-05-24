@@ -364,7 +364,7 @@ messages_en.properties : 영어 국제화 사용
 
 <br>
 
-## 검증1 Validation
+## 검증1 - Validation
 
 ### 검증 v1 - 직접처리
 #### 검증에 대해서 조건문으로 처리
