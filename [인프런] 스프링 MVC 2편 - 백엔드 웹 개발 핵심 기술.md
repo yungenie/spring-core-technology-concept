@@ -483,19 +483,8 @@ messages_en.properties : 영어 국제화 사용
 ```
 - BindingResult는 스프링이 제공하는 `검증 오류를 보관하는 객체` 입니다.
 - BindingResult가 있으면 @ModelAttribute에 데이터 바인딩 오류가 발생해도 BindingResult에 FieldError/ObjectError를 담아서 컨트롤러를 정상 호출합니다.
-- `도메인에 바인딩된 결과`가 담겨 BindingResult 파라미터는 **@ModelAttribute 다음 순서에 위치**해야 합니다. 순서가 중요합니다.
+- 도메인에 바인딩된 결과가 담겨 BindingResult 파라미터는 **@ModelAttribute 다음 순서에 위치**해야 합니다. 순서가 중요합니다.
 - BindingResult는 model에 담지 않아도 자동으로 view에 같이 넘어간다.
-
-##### 결과확인
-<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/51b8d55c-dc25-4fd7-acc8-bdb8f9630523">
-
-
-##### BindingResult 문제점
-- 고객이 입력한 문자가 사라지고, 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
-- 고객이 입력한 값도 어딘가에 별도로 관리가 되어야 한다.
-
-
-
 
 ```html
 <div class="container">
@@ -562,8 +551,22 @@ messages_en.properties : 영어 국제화 사용
     - th:errorclass : th:field에서 지정한 필드에 오류가 있으면 class 정보를 추가합니다. (객체 속성의 에러가 발생하면 class 속성 추가)
 
 
+##### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/51b8d55c-dc25-4fd7-acc8-bdb8f9630523">
+
+##### BindingResult 문제점
+- 고객이 입력한 문자가 사라지고, 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
+- 고객이 입력한 값도 어딘가에 별도로 관리가 되어야 한다.
+
 > BindingResult, FieldError, ObjectError를 사용해서 오류 메시지를 처리하는 
 > BindingResult의 오류 처리는 2가지 존재합니다. 첫번째는 바인딩 실패(타입 미스매치), 두번째는 비지니스 로직 검증 체크로 크게 나눌 수 있습니다.
+
+
+
+
+
+
+
 
 #### FieldError, ObjectError
 ##### FieldError 객체는 오류 발생시 사용자 입력 값을 저장하는 기능을 제공합니다.
