@@ -424,6 +424,10 @@ messages_en.properties : 영어 국제화 사용
 - classappend 사용해서 조건문에 해당하면 기존 class 추가하고 조건에 해당하지 않으면 _  기존 class 적용
 - map의 value를 가져올 때 ${errors['key']} 
 
+#### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/98eaa3f2-353b-424c-bae7-00f2057706a6">
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/00e3d8ba-9451-4158-8bbd-fe72839ef091">
+
 ##### 검증1 문제점
 - `타입 오류 처리`가 안되 컨트롤러 호출이 되지 않습니다.
 - 스프링 MVC에서 컨트롤러 진입하기도 전에 404 예외 발생하면서 오류 페이지를 띄워줍니다.
