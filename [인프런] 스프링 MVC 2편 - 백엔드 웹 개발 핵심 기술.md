@@ -357,7 +357,6 @@ messages_en.properties : 영어 국제화 사용
 
 #### 검증 v1 - 직접처리
 ##### 검증에 대해서 조건문으로 처리
-- 검증시 오류가 발생하면 어떤 검증에서 오류가 발생했는 지 Map자료구조에 정보(필드, 에러문구)를 담아 타임리프를 이용해 처리함.
 
 ```java
      /**
@@ -407,7 +406,9 @@ messages_en.properties : 영어 국제화 사용
         return "redirect:/validation/v1/items/{itemId}";
     }
 ```
-
+- 자료구조를 통한 직접 오류 처리
+- 검증시 오류가 발생하면 어떤 검증에서 오류가 발생했는 지 Map자료구조에 정보(필드, 에러문구)를 담아 타임리프를 이용해 처리함.
+- 타입오류 처리가 안되기 때문에 타입오류된 고객의 입력 데이터는 관리되지 않는다.
 
 ```html
 <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
@@ -420,30 +421,30 @@ messages_en.properties : 영어 국제화 사용
 <div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">상품명 오류</div>
 ```
 
-1) errors?은 errors NullPointException 발생하는 대신, null을 반환하는 문법이다.
-2) classappend 사용해서 조건문에 해당하면 기존 class 추가하고 조건에 해당하지 않으면 _  기존 class 적용
-3) map의 value를 가져올 때 ${errors['key']} 
+- errors?은 errors NullPointException 발생하는 대신, null을 반환하는 문법이다.
+- classappend 사용해서 조건문에 해당하면 기존 class 추가하고 조건에 해당하지 않으면 _  기존 class 적용
+- map의 value를 가져올 때 ${errors['key']} 
 
 ##### 검증1 문제점
-- `타입 오류 처리`가 안된다.
-- 스프링 MVC에서 컨트롤러 진입하기도 전에 예외 발생
-- 컨트롤러 호출되지도 않고, 400 예외 발생하면서 오류 페이지 띄워준다.
-- 결국, 타입 오류 처리된 데이터는 바인딩 불가능 하므로 고객이 입력한 문자가 사라지고, 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
-- **고객이 입력한 값도 어딘가에 별도로 관리**가 되어야 한다.
+- `타입 오류 처리`가 안되 컨트롤러 호출이 되지 않습니다.
+- 스프링 MVC에서 컨트롤러 진입하기도 전에 404 예외 발생하면서 오류 페이지를 띄워줍니다.
+- 타입의 오류로 데이터 바인딩 실패된 결과를 담는 무언가가 필요합니다. 
 
-#### 검증 v2 - BindingResult1
+> 정리, 고객이 입력한 데이터에 타입 오류가 발생하면 컨트롤러 호출되지 않아 오류 페이지로 이동합니다. 고객에게 타입 에러에 대한 결과를 알려줘야 합니다.
+
+#### 검증 v2 - BindingResult
 ##### 검증에 대해서 스프링과 타임리프 통합으로 제공해주는 BindingResult객체로 처리
 
 ```java
     /**
-     * 검증v2 (BindingResult1)
-     *
+     * 검증v2 (BindingResult)
+     * 스프링과 타임리프 통합으로 제공해주는 BindingResult객체로 처리
      */
     @PostMapping("/add")
     public String addItem(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         // BindingResult는 도메인에 바인딩된 결과가 담깁니다. @ModelAttribute 다음 순서에 위치해야 한다.
 
-        //검증 로직 (필드 에러 처리 - FieldError())
+        //검증 로직 (필드 에러 처리 - FieldError(), FieldError는 ObjectError의 자손)
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수 입니다."));
         }
@@ -477,16 +478,18 @@ messages_en.properties : 영어 국제화 사용
     }
 ```
 - BindingResult는 스프링이 제공하는 `검증 오류를 보관하는 객체` 입니다.
-- BindingResult 파라미터는 **@ModelAttribute 다음 순서**에 위치해야 한다. 
-- BindingResult는 model에 담지 않아도 자동으로 view로 넘어간다.
+- BindingResult가 있으면 @ModelAttribute에 데이터 바인딩 오류가 발생해도 BindingResult에 FieldError/ObjectError를 담아서 컨트롤러를 정상 호출합니다.
+- `도메인에 바인딩된 결과`가 담겨 BindingResult 파라미터는 **@ModelAttribute 다음 순서에 위치**해야 합니다. 순서가 중요합니다.
+- BindingResult는 model에 담지 않아도 자동으로 view에 같이 넘어간다.
+
+##### BindingResult 문제점
+- 고객이 입력한 문자가 사라지고, 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
+- 고객이 입력한 값도 어딘가에 별도로 관리가 되어야 한다.
+
+
+
 
 ```html
-<label for="itemName" th:text="#{label.item.itemName}">상품명</label>
-<input type="text" id="itemName" th:field="*{itemName}" th:classappend="${error?.containsKey('itemName')} ? 'field-error' : _ " class="form-control" placeholder="이름을 입력하세요">
-<div class="field-error" th:if="${errors?.containsKey('itemName')}" th:text="${errors['itemName']}">상품명 오류</div>
-
-
--> 
 <div class="container">
 
     <div class="py-5 text-center">
@@ -497,13 +500,13 @@ messages_en.properties : 영어 국제화 사용
 
         <div th:if="${#fields.hasGlobalErrors()}">
             <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">글로벌 오류 메시지</p>
-        </div>
+        </div> <!--th:each="err : ${#fields.globalErrors()}" : 오류가 담긴 컬렉션이 each 돌면서 모두 출력 -->
 
         <div>
             <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
             <input type="text" id="itemName" th:field="*{itemName}"
-                   th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요">
-            <div class="field-error" th:errors="*{itemName}">
+                   th:errorclass="field-error" class="form-control" placeholder="이름을 입력하세요"> <!--th:field="*{itemName}" : 해당 필드에 해당하는 오류가 있으면 뒤에 에러태그들 작동 th:errorclass="field-error" : 에러가 나면 적용, 안나면 적용 안함-->
+            <div class="field-error" th:errors="*{itemName}"> <!--th:errors="*{itemName}" : 에러가 있으면 출력, 없으면 출력 안함-->
                 상품명 오류
             </div>
         </div>
@@ -543,15 +546,15 @@ messages_en.properties : 영어 국제화 사용
     </form>
 
 </div> <!-- /container -->
-</body>
-</html>
 ```
 - 타임리프 스프링 검증 오류 통합 기능
-    - 스프링의 BindingResult를 활용해서 편리하게 검증 오류를 표현하는 기능으로 타임리프와 통합해서 사용할 수 있습니다.
+    - 스프링의 `BindingResult를 활용해서 편리하게 검증 오류를 표현하는 기능으로 타임리프와 통합해서 사용`할 수 있습니다.
     - #fields : BindingRessult가 제공하는 검증 오류에 접근할 수 있습니다.
     - th:errors : 해당 필드에 오류가 있는 경우 태그를 출력합니다. (객체 속성의 에러가 발생하면 오류 문구 출력)
     - th:errorclass : th:field에서 지정한 필드에 오류가 있으면 class 정보를 추가합니다. (객체 속성의 에러가 발생하면 class 속성 추가)
 
+
+> BindingResult, FieldError, ObjectError를 사용해서 오류 메시지를 처리하는 
 > BindingResult의 오류 처리는 2가지 존재합니다. 첫번째는 바인딩 실패(타입 미스매치), 두번째는 비지니스 로직 검증 체크로 크게 나눌 수 있습니다.
 
 #### FieldError, ObjectError
