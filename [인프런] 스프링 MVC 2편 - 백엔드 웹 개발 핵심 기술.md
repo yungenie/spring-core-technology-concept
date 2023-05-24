@@ -442,7 +442,8 @@ messages_en.properties : 영어 국제화 사용
 ```java
     /**
      * 검증v2 (BindingResult)
-     * 스프링과 타임리프 통합으로 제공해주는 BindingResult객체로 처리
+     * - 객체에 타입 오류 등으로 바인딩이 실패하는 경우에도 해당 에러 결과를 보여줍니다.
+     * - 문제점 : 바인딩 실패된 데이터에 대해서는 결과 및 입력 데이터가 유지되지만, 로직 검증 실패된 데이터는 사라진다.
      */
     @PostMapping("/add")
     public String addItem(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
@@ -560,31 +561,36 @@ messages_en.properties : 영어 국제화 사용
 ##### BindingResult 문제점
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/32e234c0-bb6a-4980-8f51-667af67cb993">
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/1dcca045-1c87-4c57-bc79-a4c3e8d0fb01">
+
 - BindingResult를 적용해서 타입오류로 바인딩 실패에 대한 에러내용과 해당 입력문자는 유지되도록 수정을 했습니다.
 - 그러나, 타입 오류가 아닌 검증 오류 발생 시 고객이 입력한 문자가 사라지고 본인이 어떤 내용을 입력해서 오류가 발생했는지 이해하기 어렵다.
 - 고객이 입력한 값도 어딘가에 별도로 관리가 되어야 한다.
 
-> 정리, BindingResult의 오류 처리는 2가지 존재합니다. 첫번째는 바인딩 실패(타입 미스매치), 두번째는 비지니스 로직 검증 체크로 크게 나눌 수 있습니다. 또한 바인딩 실패한 입력 데이터만 유지하는 게 아닌, 로직 검증 실패에 대해서도 데이터 유지를 해야합니다.
+> 정리, BindingResult의 오류 처리는 2가지 존재합니다. 첫번째는 바인딩 실패(타입 미스매치), 두번째는 비지니스 로직 검증 체크로 크게 나눌 수 있습니다. 또한 바인딩 실패한 입력 데이터만 유지하는 게 아닌, 로직 검증 실패에 대해서도 사용자 입력 값을 유지해야 합니다.
 
 
-#### FieldError, ObjectError
-##### FieldError 객체는 오류 발생시 사용자 입력 값을 저장하는 기능을 제공합니다.
+#### FieldError
+##### FieldError 객체는 오류 발생시 사용자 입력 값을 유지하는 기능을 제공합니다.
 
 ```java
-@PostMapping("/add")
-    public String addItemV2(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    /**
+     * 검증v2 (FieldError, ObjectError)
+     * - 오류 발생시 사용자 입력 값이 유지되도록 처리 합니다. (데이터 보존)
+     */
+    @PostMapping("/add")
+    public String addItem(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         /* FieldError 객체는 오류가 발생한 경우 사용자 입력 값을 보관해줍니다.
         FieldError(objectName, field, rejectedValue, bindingFailure, codes, arguments, defaultMessage)
         objectName : 오류가 발생한 객체 이름
         field : 오류 필드
-        rejectedValue : 사용자가 입력한 값(거절된 값)
+        rejectedValue : 사용자가 입력한 값(거절된 값) ★
         bindingFailure : 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
         codes : 메시지 코드
         arguments : 메시지에서 사용하는 인자
         defaultMessage : 기본 오류 메시지
         */
 
-        //검증 로직
+        //검증 로직 - rejectedValue 파라미터에 사용자가 입력한 값(거절된 값)을 추가해줍니다.
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수 입니다."));
         }
@@ -616,21 +622,34 @@ messages_en.properties : 영어 국제화 사용
         return "redirect:/validation/v2/items/{itemId}";
     }
 ```
+- 사용자의 입력 데이터가 컨트롤러의 @ModelAttribute에 바인딩 되는 시점에 오류가 발생되면 모델 객체에 사용자 입력 값을 유지하기 어렵습니다.
+- 그래서 바인딩 실패가 나면 입력 값을 별도로 보관하는 FieldError()객체를 통해서 사용자 입력 값을 저장하여 처리합니다.
+- FieldError객체의 rejectedValue 파라미터가 바로 오류 발생시 사용자 입력 값을 저장하는 필드입니다.
 
-##### 타임리프의 사용자 입력 값 유지
-- 오류가 발생하면 위의 FieldError 객체에서 보관한 값을 출력합니다.
+
 ```html
-<label for="quantity" th:text="#{label.item.quantity}">수량</label>
-            <input type="text" id="quantity" th:field="*{quantity}"
-                   th:errorclass="field-error" class="form-control" placeholder="수량을 입력하세요">
-            <div class="field-error" th:errors="*{quantity}">
-                수량 오류
+        <div>
+            <label for="price" th:text="#{label.item.price}">가격</label>
+            <input type="text" id="price" th:field="*{price}"
+                   th:errorclass="field-error" class="form-control" placeholder="가격을 입력하세요">
+            <div class="field-error" th:errors="*{price}">
+                가격 오류
             </div>
+        </div>
 ```
 
-> 타입 오류로 바인딩에 실패하면 스프링은 FieldError 를 생성하면서 사용자가 입력한 값을 넣어둡니다.
-> 그리고 해당 오류를 BindingResult 에 담아서 컨트롤러를 호출하고, 타입 오류 같은 바인딩 실패시에도 사용자의 오류 메시지를 정상 출력할 수 있습니다.
-> 그러므로 BindingResult는 스프링의 바인딩 오류 처리를 효율적으로 처리해줍니다.
+- 타임리프의 th:field 태그는 정상 상황에서는 모델 객체 값을 사용하지만, 오류가 발생하면 FieldError에서 보관한 값을 사용해서 출력을 해줍니다.
+
+#### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/72da5670-8c95-4eb2-9169-926d7b49d8db">
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/481d9942-9d23-40cd-9eae-60af58dc8212">
+
+- 스프링과 타임리프를 통해 바인딩 오류나 검증 로직 오류에 대해 사용자 입력 값을 유지하고 에러 메시지를 보여주도록 개선했습니다.
+
+##### FieldError 문제점
+- 스프링이 제공하는 시스템상의 기본적인 오류 문구가 사용자에게 전달되므로, 사용자에게 보여주는 메시지가 별도 처리가 필요합니다.
+
+> BindingResult, FieldError를 이용해서 바인딩 오류, 검증 로직 오류에 대해서 사용자에게 메시지를 전달하고 입력 값을 유지하는 방법에 대해서 정리했습니다.
 
 
 
