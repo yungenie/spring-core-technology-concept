@@ -822,6 +822,8 @@ log.info("errors={} ", bindingResult);
 #### 결과확인
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/2ecb7d1d-464b-4a5c-88cc-fb6be69f2f40">
 
+<br>
+
 ### 오류 코드와 메시지 처리3
 #### bindingResult.rejectValue(), reject() 축약된 오류 코드 구성 설명
 
@@ -869,6 +871,78 @@ max= {0} 까지 허용합니다.
 - 단순하게 만들면 범용성은 좋지만 세밀하게 작성할 수 없고, 세밀하게 만들면 범용성있게 사용을 못하는 차이가 있습니다.
 - 가장 좋은 방법은 범용성으로 사용하다가 필요한 부분에서만 세밀하게 작성하는 것이 좋습니다.
 - 우선순위는 Level1의 객체명과 필드명의 조합한 메시지가 있는 지 확인하고 없다면 범용성있는 코드를 찾아 적용합니다.
+- 스프링은 이러한 기능을 MessageCodesResolver을 통해 지원해줍니다.
 
+<br>
+
+#### 오류 코드와 메시지 처리4
+##### MessageCodesResolver 동작 방식
+
+```java
+public class MessageCodesResolverTest {
+
+    MessageCodesResolver codesResolver = new DefaultMessageCodesResolver();
+
+    @Test
+    void messageCodesResolverObject() {
+        String[] messageCodes = codesResolver.resolveMessageCodes("required", "item");
+        for (String messageCode : messageCodes) {
+            System.out.println("messageCode = " + messageCode);
+            /*
+            * 결과는 디테일한 게 먼저 나오고 범용적인게 나온다.
+            * messageCode = required.item
+            * messageCode = required
+            * */
+
+        }
+        
+        assertThat(messageCodes).containsExactly("required.item", "required");
+    }
+
+    @Test
+    void messageCodesResolverField() {
+        String[] messageCodes = codesResolver.resolveMessageCodes("required", "item", "itemName", String.class);
+        assertThat(messageCodes).containsExactly(
+                "required.item.itemName",
+                "required.itemName",
+                "required.java.lang.String",
+                "required"
+        );
+    }
+
+}
+```
+- MessageCodesResolver는 검증 오류 메시지 코드를 생성하는 인터페이스 입니다.
+- DefaultMessageCodesResolver가 MessageCodesResolver의 구현체입니다.
+
+##### DefaultMessageCodesResolver의 메시지 생성 규칙 및 동작방식
+- 필드 오류
+    - 필드 오류의 경우 다음 순서로 4가지 메시지 코드 생성
+    
+```
+1.: code + "." + object name + "." + field
+2.: code + "." + field
+3.: code + "." + field type
+4.: code
+
+예) 오류 코드: typeMismatch, object name "user", field "age", field type: int
+1. "typeMismatch.user.age"
+2. "typeMismatch.age"
+3. "typeMismatch.int"
+4. "typeMismatch"
+```
+- 객체 오류
+    - 필드 오류의 경우 다음 순서로 2가지 메시지 코드 생성
+```
+객체 오류의 경우 다음 순서로 2가지 생성
+1.: code + "." + object name
+2.: code
+
+예) 오류 코드: required, object name: item
+1.: required.item
+2.: required
+```
+- bindingResult.rejectValue(), reject()는 내부에서 MessageCodesResolver를 사용합니다. 
+- MessageCodesResolver는 FieldError, ObejctError를 호출해서 String[] 오류 코드 배열에 생성된 순서대로 오류 코드를 반환해줍니다. 
 
 
