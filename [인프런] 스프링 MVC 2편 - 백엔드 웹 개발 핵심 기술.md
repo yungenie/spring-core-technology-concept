@@ -685,11 +685,11 @@ messages_en.properties : 영어 국제화 사용
 - errors.properties에 등록한 오류 메시지를 사용해서 처리할 수 있다.
 - errors.properties 설정 파일을 사용하기 위해서 application.properties에 spring.messages.basename=에 errors 추가 합니다.
 
-#### [application.properties](http://application.properties) 설정
+#### application.properties 설정
 ```spring.messages.basename=messages,errors```
 - messages.properties 와 errors.properties 둘다 찾아 사용하게 됩니다.
 
-#### [errors.properties](http://errors.properties) 설정
+#### errors.properties 설정
 
 ```
 # 제약조건.객체명.필드명
