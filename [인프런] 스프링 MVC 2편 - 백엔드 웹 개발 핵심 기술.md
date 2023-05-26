@@ -752,12 +752,30 @@ log.info("errors={} ", bindingResult);
 #### 결과확인
 <img width="459" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/3c9cbef0-db14-49fa-80fc-6615e9466d00">
 
-
-
+<br>
 
 ### 오류 코드와 메시지 처리2
 
-- bindingResult.FieldError()를 직접 다룰 때는 오류 코드를 range.item.price 정의한 코드를 모두 입력했다. bindingResult.rejectValue()를 사용해서 축약된 오류 코드를 사용할 수 있다. (범용성으로 간단하게 작성할 때)
+```java
+    @PostMapping("/add")
+    public String addItem(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
+        .
+        .
+        (생략)
+    }
+```
+
+##### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/3a101cc1-c1bd-410f-be9e-098a93c5085b">
+
+- BindingResult는 검증해야할 객체인 target을 알고 있습니다.
+
+> target 도메인 객체를 알고 있기 때문에 FieldError, ObjectError를 사용하지 않고 BindingResult를 활용해서 자동화 시킬 수 있습니다. (다음 확인)
+
+#### BindingResult rejectValue(), reject()
 
 ```java
 public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
@@ -796,6 +814,11 @@ log.info("errors={} ", bindingResult);
     return "redirect:/validation/v2/items/{itemId}";
 }
 ```
+
+- bindingResult.FieldError()를 직접 다룰 때는 오류 코드를 range.item.price 정의한 코드를 모두 입력했다. 
+- bindingResult.rejectValue(), reject()를 사용해서 축약된 오류 코드를 사용할 수 있다. (범용성으로 간단하게 작성할 때)
+- rejectValue(), reject() 메소드 내부적으로 FieldError, ObjectError를 자동으로 생성해 `오류 코드를 조합`해서 만들어줍니다.
+
 
 ### 오류 코드와 메시지 처리3
 
