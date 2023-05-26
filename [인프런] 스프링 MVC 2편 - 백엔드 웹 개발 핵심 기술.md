@@ -701,7 +701,7 @@ totalPriceMin=가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재
 ```
 
 ```java
-public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+public String addItem(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
     /* FieldError 객체는 오류가 발생한 경우 사용자 입력 값을 보관해줍니다.
     FieldError(objectName, field, rejectedValue, bindingFailure, codes, arguments, defaultMessage)
     objectName : 오류가 발생한 객체 이름
