@@ -819,7 +819,56 @@ log.info("errors={} ", bindingResult);
 - bindingResult.rejectValue(), reject()를 사용해서 축약된 오류 코드를 사용할 수 있다. (범용성으로 간단하게 작성할 때)
 - rejectValue(), reject() 메소드 내부적으로 FieldError, ObjectError를 자동으로 생성해 `오류 코드를 조합`해서 만들어줍니다.
 
+#### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/2ecb7d1d-464b-4a5c-88cc-fb6be69f2f40">
 
 ### 오류 코드와 메시지 처리3
+#### bindingResult.rejectValue(), reject() 축약된 오류 코드 구성 설명
 
-- 처리2는 범용적으로 간단하게 작성할 때 좋다. 세밀하게 작성해야 할 때는 메시지에 단계를 두고 사용하면 된다.
+```java
+    if (!StringUtils.hasText(item.getItemName())) {
+        bindingResult.rejectValue("itemName", "required");
+    }
+    if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+        bindingResult.rejectValue("price", "range", new Object[]{1000, 10000000}, null);
+    }
+    if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+        bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+    }
+
+    //특정 필드가 아닌 복합 룰 검증
+    if (item.getPrice() != null && item.getQuantity() != null) {
+        int resultPrice = item.getPrice() * item.getQuantity();
+        if (resultPrice < 10000) {
+            bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+        }
+    }
+```
+
+- bindingResult.rejectValue("itemName", "required");
+- 오류 코드와 메시지 처리2에서 bindingResult.rejectValue(), reject()로 축약된 오류 코드를 사용했습니다.
+- 오류 코드의 조합은 제약조건.객체명.필드명로 자동으로 조합해서 오류 메시지 코드를 찾습니다. 
+
+#### 오류 코드 범용성
+```
+#Level1
+# 제약조건.객체명.필드명
+required.default= 필수로 입력해주세요.~2
+required.item.itemName=상품 이름은 필수입니다. ~2
+range.item.price=가격은 {0} ~ {1} 까지 허용합니다. ~2
+max.item.quantity=수량은 최대 {0} 까지 허용합니다. ~2
+totalPriceMin=가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1} ~2
+
+#Level2
+required = 필수 값 입니다.
+min= {0} 이상이어야 합니다.
+range= {0} ~ {1} 범위를 허용합니다.
+max= {0} 까지 허용합니다.
+```
+- Level1처럼 필드별로 세밀하게 작성할 수도 있고, Level2처럼 범용성있게 사용할 수 있습니다.
+- 단순하게 만들면 범용성은 좋지만 세밀하게 작성할 수 없고, 세밀하게 만들면 범용성있게 사용을 못하는 차이가 있습니다.
+- 가장 좋은 방법은 범용성으로 사용하다가 필요한 부분에서만 세밀하게 작성하는 것이 좋습니다.
+- 우선순위는 Level1의 객체명과 필드명의 조합한 메시지가 있는 지 확인하고 없다면 범용성있는 코드를 찾아 적용합니다.
+
+
+
