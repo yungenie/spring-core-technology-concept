@@ -502,6 +502,15 @@ messages_en.properties : 영어 국제화 사용
 - 도메인에 바인딩된 결과가 담겨 BindingResult 파라미터는 **@ModelAttribute 다음 순서에 위치**해야 합니다. 순서가 중요합니다.
 - BindingResult는 model에 담지 않아도 자동으로 view에 같이 넘어간다.
 
+
+##### BindingResult 설명
+- BindingResult 는 인터페이스이고, Errors 인터페이스를 상속받고 있다. 
+- 실제 넘어오는 구현체는 BeanPropertyBindingResult 라는 것인데, 둘다 구현하고 있으므로 BindingResult 대신에 Errors 를 사용해도 된다. 
+- Errors 인터페이스는 단순한 오류 저장과 조회 기능을 제공한다. 
+- BindingResult 는 여기에 더해서 추가적인 기능들을 제공한다. 
+- addError() 도 BindingResult 가 제공하므로 여기서는 BindingResult 를 사용하자. 주로 관례상 BindingResult 를많이 사용한다.
+
+
 ```html
 <div class="container">
 
@@ -673,17 +682,17 @@ messages_en.properties : 영어 국제화 사용
 
 ### 오류 코드와 메시지 처리1
 
-- errors 에 등록한 메시지를 사용해서 처리할 수 있다.
+- errors.properties에 등록한 오류 메시지를 사용해서 처리할 수 있다.
+- errors.properties 설정 파일을 사용하기 위해서 application.properties에 spring.messages.basename=에 errors 추가 합니다.
 
 #### [application.properties](http://application.properties) 설정
-
-→ spring.messages.basename=messages,errors
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/462e18ec-97b7-4280-8f9b-0d3f905f9ca2/Untitled.png)
+```spring.messages.basename=messages,errors```
+- messages.properties 와 errors.properties 둘다 찾아 사용하게 됩니다.
 
 #### [errors.properties](http://errors.properties) 설정
 
 ```
+# 제약조건.객체명.필드명
 required.default= 필수로 입력해주세요.
 required.item.itemName=상품 이름은 필수입니다.
 range.item.price=가격은 {0} ~ {1} 까지 허용합니다.
@@ -699,7 +708,7 @@ public String addItemV3(@ModelAttribute Item item, BindingResult bindingResult, 
     field : 오류 필드
     rejectedValue : 사용자가 입력한 값(거절된 값)
     bindingFailure : 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
-    codes : 메시지 코드 (errors.properties)
+    codes : 메시지 코드 (errors.properties) ★
     arguments : 메시지에서 사용하는 인자
     defaultMessage : 기본 오류 메시지
     */
@@ -735,6 +744,16 @@ log.info("errors={} ", bindingResult);
     redirectAttributes.addAttribute("status", true);
 
 ```
+- FieldError(objectName, field, rejectedValue, bindingFailure, codes, arguments, defaultMessage)
+- codes는 오류 메시지 코드로 배열(new String[]{"required.item.itemName", "required.default"})에 여러 코드를 담아 순서대로 매칭해서 보여집니다.
+- errors.properties에 required.item.itemName 에러코드를 못 찾을 경우 배열의 다음 요소 코드를 찾습니다.
+- 배열에 담긴 에러코드를 모두 못찾을 경우 defaultMessage를 보여주고 defaultMessage가 null일 경우 오류 페이지가 뜹니다.
+
+#### 결과확인
+<img width="459" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/3c9cbef0-db14-49fa-80fc-6615e9466d00">
+
+
+
 
 ### 오류 코드와 메시지 처리2
 
