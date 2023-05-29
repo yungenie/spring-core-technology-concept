@@ -945,4 +945,66 @@ public class MessageCodesResolverTest {
 - bindingResult.rejectValue(), reject()는 내부에서 MessageCodesResolver를 사용합니다. 
 - MessageCodesResolver는 FieldError, ObejctError를 호출해서 String[] 오류 코드 배열에 생성된 순서대로 오류 코드를 반환해줍니다. 
 
+#### 오류 코드와 메시지 처리5
+##### errors.properties 설정
+- 오류 코드 레벨별로 설정 후 테스트 확인  
+```
+#==ObjectError==
+#Level1
+totalPriceMin.item=상품의 가격 * 수량의 합은 {0}원 이상이어야 합니다. 현재 값 = {1}
+
+#Level2 - 생략
+totalPriceMin=전체 가격은 {0}원 이상이어야 합니다! 현재 값 = {1}
+
+#==FieldError==
+#Level1
+required.item.itemName=상품 이름은 필수입니다!
+range.item.price=가격은 {0} ~ {1} 까지 허용합니다!
+max.item.quantity=수량은 최대 {0} 까지 허용합니다!
+
+#Level2
+required.item=상품은 필수 입니다.
+
+#Level3
+required.java.lang.String = 필수 문자입니다.
+required.java.lang.Integer = 필수 숫자입니다.
+min.java.lang.String = {0} 이상의 문자를 입력해주세요.
+min.java.lang.Integer = {0} 이상의 숫자를 입력해주세요.
+range.java.lang.String = {0} ~ {1} 까지의 문자를 입력해주세요.
+range.java.lang.Integer = {0} ~ {1} 까지의 숫자를 입력해주세요.
+max.java.lang.String = {0} 까지의 숫자를 허용합니다.
+max.java.lang.Integer = {0} 까지의 숫자를 허용합니다.
+
+#Level4
+required = 필수 값 입니다.
+min= {0} 이상이어야 합니다.
+range= {0} ~ {1} 범위를 허용합니다.
+max= {0} 까지 허용합니다.
+```
+
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/821b3bbd-43e3-48fc-8636-badcc8e3e6d0">
+
+##### ValidationUtils 적용
+```java
+if (!StringUtils.hasText(item.getItemName())) {
+    bindingResult.rejectValue("itemName", "required");
+}
+```
+-> 변경
+
+```java
+ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
+```
+
+- empty, 공백 같은 단순한 기능을 제공해주는 클래스로 검증 처리시 if문 없이 한줄로 처리 가능합니다.
+
+> bindingResult 정리
+> 1. rejectValue(), reject() 호출
+> 2. MessageCodesResolver를 사용해서 검증 오류 코드의 Level순서로 메시지 코드를 생성
+> 3. new FieldError를 생성하면서 메시지 코드들을 보관
+> 4. th:errors에서 메시지 코드들로 메시지를 순서대로 메시지에서 찾고, 노출
+
+
+
+
 
