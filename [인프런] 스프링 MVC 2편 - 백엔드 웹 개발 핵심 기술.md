@@ -981,7 +981,7 @@ min= {0} 이상이어야 합니다.
 range= {0} ~ {1} 범위를 허용합니다.
 max= {0} 까지 허용합니다.
 ```
-
+#### 결과확인
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/821b3bbd-43e3-48fc-8636-badcc8e3e6d0">
 
 ##### ValidationUtils 적용
@@ -1005,6 +1005,31 @@ ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required")
 > 4. th:errors에서 메시지 코드들로 메시지를 순서대로 메시지에서 찾고, 노출
 
 
+#### 오류 코드와 메시지 처리6
+##### 스프링이 직접 만든 오류 메시지 처리
+<img width="590" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/663c78c3-8e2f-4864-a4c1-ef40764bd946">
 
+- 가격 필드에 문자를 입력 후 저장을 합니다. 
+- 로그를 확인해보면 다음과 같은 메시지 코드들이 생성됩니다.
+- **스프링은 타입오류가 발생하면 typeMismatch라는 오류코드가 MessageCodesResoulver를 통해서 생성**합니다. 
 
+```java
+Field error in object 'item' on field 'price': rejected value [qqqq]; codes [typeMismatch.item.price,typeMismatch.price,typeMismatch.java.lang.Integer,typeMismatch]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [item.price,price]; arguments []; default message [price]]; default message [Failed to convert property value of type 'java.lang.String' to required type 'java.lang.Integer' for property 'price'; nested exception is java.lang.NumberFormatException: For input string: "qqqq"]
+```
 
+- 다음과 같은 4가지 메시지 코드가 순서대로 입력되어 있습니다.
+    - typeMismatch.item.price,
+    - typeMismatch.price,
+    - typeMismatch.java.lang.Integer,
+    - typeMismatch
+
+##### errors.properties 설정
+```
+#추가 (스프링이 제공해주는 오류 활용)
+typeMismatch.java.lang.Integer=숫자를 입력해주세요.
+typeMismatch=타입 오류입니다.
+```
+- MessageCodesResoulver가 생성해준 오류코드를 직접 errors.properties에 추가하여 처리합니다.
+
+#### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/6e06ce4e-9af0-4d2f-af35-582f4fed63f2">
