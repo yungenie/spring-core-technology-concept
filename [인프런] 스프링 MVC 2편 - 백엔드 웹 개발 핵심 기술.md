@@ -1115,4 +1115,51 @@ public class ValidationItemControllerV2 {
 ##### 결과확인 
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/b25f405f-2b30-4430-a617-cf8618f98cf4">
 
+#### Validator 분리2
+- Validator인터페이스를 구현하여 검증로직에 직접 불러서 사용했습니다.
+- Validator 애노테이션을 사용해서 스프링의 추가적인 도움을 받을 수 있습니다.
+
+##### WebDataBinder를 통해서 사용하기
+
+```java
+@Slf4j
+@Controller
+@RequestMapping("/validation/v2/items")
+@RequiredArgsConstructor
+public class ValidationItemControllerV2 {
+
+    private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
+
+    @InitBinder
+    public void init(WebDataBinder dataBinder) {
+        dataBinder.addValidators(itemValidator);
+    }
     
+    /**
+     * Validator2 - (@Validate 애노테이션)
+     */
+    @PostMapping("/add")
+    public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        
+        //itemValidator.validate(item, bindingResult);
+        
+        //검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors={} ", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+```
+- WebdataBinder는 스프링의 파라미터 바인딩 역할을 해주고 검증 기능도 내부에 포함해줍니다.
+- WebdataBinder에 검증기를 추가해주면 해당 컨트롤러에서는 검증기를 자동으로 적용할 수 있습니다.
+- @InitBinder는 해당 컨트롤러에만 영향을 줍니다.
+
+#### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/34ca1bee-e2d1-432a-a219-bf8a3ff38ba3">
