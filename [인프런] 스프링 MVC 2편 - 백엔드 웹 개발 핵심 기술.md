@@ -1033,3 +1033,86 @@ typeMismatch=타입 오류입니다.
 
 #### 결과확인
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/6e06ce4e-9af0-4d2f-af35-582f4fed63f2">
+
+#### Validator 분리1
+##### 복잡한 검증 로직을 별도로 분리하자
+
+```java
+import hello.itemservice.domain.item.Item;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+@Component // 컴포넌트 스캔으로 빈등록
+public class ItemValidator implements Validator {
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return Item.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        Item item = (Item) target;
+
+        if (!StringUtils.hasText(item.getItemName())) {
+            errors.rejectValue("itemName", "required");
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            errors.rejectValue("price", "range", new Object[]{1000, 10000000}, null);
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            errors.rejectValue("quantity", "max", new Object[]{9999}, null);
+        }
+
+        //특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                errors.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+    }
+}
+```
+- 스프링은 검증을 체계적으로 제공하기 위해 Validator라는 인터페이스를 제공합니다.
+- Validator.validate(Object target, Errors errors) bindingResult의 부모 Error가 제공됩니다.
+
+```java
+@Slf4j
+@Controller
+@RequestMapping("/validation/v2/items")
+@RequiredArgsConstructor
+public class ValidationItemControllerV2 {
+
+    private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator; // 등록한 빈 주입
+    
+    /**
+     * Validator 분리1 - (검증 로직 분리)
+     */
+    @PostMapping("/add")
+    public String addItem(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        itemValidator.validate(item, bindingResult);
+
+        //검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors={} ", bindingResult);
+            return "validation/v2/addForm";
+        }
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+}
+
+``` 
+##### 결과확인 
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/b25f405f-2b30-4430-a617-cf8618f98cf4">
+
+    
