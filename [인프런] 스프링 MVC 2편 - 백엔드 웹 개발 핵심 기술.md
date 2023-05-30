@@ -1181,11 +1181,11 @@ dependencies {
 }
 ```
 
-Bean Validation 인터페이스 
-<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/86563244-3b3c-4318-98c3-22b35dbb7505">
+- Bean Validation 인터페이스  
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/86563244-3b3c-4318-98c3-22b35dbb7505"> 
 
-Bean Validation 인터페이스의 구현체 (hibernate) 실제 동작하는 구현체
-<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/37d4d4a1-a12c-4e5d-824b-8b3783925a32">
+- Bean Validation 인터페이스의 구현체 (hibernate) 실제 동작하는 구현체 
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/37d4d4a1-a12c-4e5d-824b-8b3783925a32"> 
 
  
 #### @NotBlank, @NotNull, @Range, @Max 기본 애노테이션
