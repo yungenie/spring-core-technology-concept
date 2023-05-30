@@ -1118,7 +1118,7 @@ public class ValidationItemControllerV2 {
 
 ### Validator 분리2
 - Validator인터페이스를 구현하여 검증로직에 직접 불러서 사용했습니다.
-- Validator 애노테이션을 사용해서 스프링의 추가적인 도움을 받을 수 있습니다.
+- `@Validator` 애노테이션을 사용해서 스프링의 추가적인 도움을 받을 수 있습니다.
 
 #### WebDataBinder를 통해서 사용하기
 
