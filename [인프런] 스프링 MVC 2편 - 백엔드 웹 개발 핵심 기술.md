@@ -1165,11 +1165,145 @@ public class ValidationItemControllerV2 {
 #### 결과확인
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/34ca1bee-e2d1-432a-a219-bf8a3ff38ba3">
 
+<br>
+
 ## 검증2 - Bean Validation
 ### Bean Validation
 - validator2에서 검증기를 매번 도메인마다 코드로 작성하는 것이 상당히 번거롭습니다. 
 - 빈 값인지, 특정 크기를 넘는 지 아닌지에 대한 검증 로직을 애노테이션으로 처리할 수 있게 공통화, 표준화한 것이 Bean Validation 입니다.
 - Bean Validation는 구현체가 아니라 인터페이스로 자바에서 제공하는 표준 기술입니다. 일반적으로 사용하는 구현체는 하이버네이트 Validator 입니다.
+
+
+#### build.gradle 의존관계 추가
+```
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+}
+```
+
+Bean Validation 인터페이스 
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/86563244-3b3c-4318-98c3-22b35dbb7505">
+
+Bean Validation 인터페이스의 구현체 (hibernate) 실제 동작하는 구현체
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/37d4d4a1-a12c-4e5d-824b-8b3783925a32">
+
+ 
+#### @NotBlank, @NotNull, @Range, @Max 기본 애노테이션
+```java
+import lombok.Data;
+import org.hibernate.validator.constraints.Range;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@Data
+public class Item {
+
+    private Long id;
+
+    @NotBlank
+    private String itemName;
+
+    @NotBlank
+    @Range(min = 1000, max = 1000000)
+    private Integer price;
+
+    @NotNull
+    @Max(9999)
+    private Integer quantity;
+
+    public Item() {
+    }
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+- javax.validation는 특정 구현에 관계없이 제공되는 표준 인터페이스
+- org.hibernate.validator는 하이버네이트 validator 구현체를 사용할때만 제공되는 검증 기능. (스프링 부트에 내장되어 있음)
+- @NotBlank : null 과 "" 과 " " 모두 허용하지 않습니다.
+- @NotNull : null을 허용하지 않습니다.
+- @Range(min= min, mix= max) : 범위 안의 값이어야 합니다.
+- @Max(max) : 최대 max까지만 허용합니다.
+
+```java
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.util.Set;
+
+public class BeanValidationTest {
+
+    @Test
+    void beanValidation() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
+        Item item = new Item();
+        //item.setItemName("상품");
+        item.setItemName(" "); //공백
+        item.setPrice(1111);
+        item.setQuantity(1);
+        //item.setPrice(0);
+        //item.setQuantity(10000);
+
+        Set<ConstraintViolation<Item>> violations = validator.validate(item);
+        for (ConstraintViolation<Item> violation : violations) {
+            System.out.println("violation = " + violation);
+            System.out.println("violation = " + violation.getMessage());
+        }
+
+    }
+}
+```
+
+#### 테스트 실행 결과
+```
+violation = ConstraintViolationImpl{interpolatedMessage='공백일 수 없습니다', propertyPath=itemName, rootBeanClass=class hello.itemservice.domain.item.Item, messageTemplate='{javax.validation.constraints.NotBlank.message}'}
+violation = 공백일 수 없습니다
+violation = ConstraintViolationImpl{interpolatedMessage='1000에서 1000000 사이여야 합니다', propertyPath=price, rootBeanClass=class hello.itemservice.domain.item.Item, messageTemplate='{org.hibernate.validator.constraints.Range.message}'}
+violation = 1000에서 1000000 사이여야 합니다
+violation = ConstraintViolationImpl{interpolatedMessage='9999 이하여야 합니다', propertyPath=quantity, rootBeanClass=class hello.itemservice.domain.item.Item, messageTemplate='{javax.validation.constraints.Max.message}'}
+violation = 9999 이하여야 합니다
+```
+
+- 검증 대상( item )을 직접 검증기에 넣고 그 결과를 받는다. Set 에는 ConstraintViolation 이라는 검증오류가 담긴다. 따라서 결과가 비어있으면 검증 오류가 없는 것이다.
+- 그러므로, 직접 코드 구현을 하지 않고 애노테이션으로 검증을 할 수 있으며, 오류 메시지 또한 자동 생성해줍니다.
+
+#### @NotBlank, @NotNull, @Range, @Max 기본 애노테이션 (dafault message)
+
+```java
+@Data
+public class Item {
+
+    private Long id;
+
+    @NotBlank(message = "공백은 불가 합니다.")
+    private String itemName;
+
+    @NotNull(message = "입력해주세요.")
+    @Range(min = 1000, max = 1000000, message = "1000~1000000 사이값 입니다.")
+    private Integer price;
+
+    @NotNull
+    @Max(value = 9999, message = "최대값은 9999 입니다.")
+    private Integer quantity;
+
+    public Item() {
+    }
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+- 디폴트 오류 메시지도 추가할 수 있습니다.
+- 추가적인 오류 메시지를 보여주고자 할 때 message="" 안에 내용을 넣어주면 됩니다.
 
 
 
