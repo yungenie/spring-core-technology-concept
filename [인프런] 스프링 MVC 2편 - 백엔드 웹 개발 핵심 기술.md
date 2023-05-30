@@ -1305,6 +1305,87 @@ public class Item {
 - 디폴트 오류 메시지도 추가할 수 있습니다.
 - 추가적인 오류 메시지를 보여주고자 할 때 message="" 안에 내용을 넣어주면 됩니다.
 
+### Bean Validation 스프링 적용
+
+```java
+@Slf4j
+@Controller
+@RequestMapping("/validation/v3/items")
+@RequiredArgsConstructor
+public class ValidationItemControllerV3 {
+
+    private final ItemRepository itemRepository;
+    @PostMapping("/add")
+    public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        //특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        //검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors={} ", bindingResult);
+            return "validation/v3/addForm";
+        }
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v3/items/{itemId}";
+    }
+```
+- 검증할 도메인에 Bean Validation 애노테이션 적용 후, validator2 처럼 @ModelAttribute 앞에 @Validated만 써주면 자동으로 적용을 해줍니다.
+
+#### 결과확인
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/eaa3469b-7999-4f02-8141-0fecde3edeff">
+
+
+##### 스프링 MVC는 어떻게 Bean Validator를 사용?
+- spring-boot-starter-validation 라이브러리를 넣어면 자동으로 Bean Validator를 인지하고 스프링이 통합합니다.
+- LocalValidatorFactoryBean을 글로벌 Validator로 등록하여 Bean Validator 애노테이션을 보고 검증을 수행합니다.
+
+##### 검증 순서
+- @ModelAttribute 각각 필드의 타입 변환 시도
+	1. 성공하면 다음으로
+	2. 실패하면 typemismatch로 fieldError 추가
+- 타입 변환 시도에 성공하면 Validator 적용
+
+
+
+### Bean Validation 에러코드
+
+```
+Field error in object 'item' on field 'itemName': rejected value []; codes [NotBlank.item.itemName,NotBlank.itemName,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [item.itemName,itemName]; arguments []; default message [itemName]]; default message [공백은 불가 합니다.] 
+```
+- Bean Validation이 기본으로 제공하는 오류 메시지를 자세히 관리하고 싶은 경우 errors.properties에  메시지를 등록해주면 됩니다.
+
+```
+#Bean Validation 추가
+NotBlank.item.itemName=상품 이름을 적어주세요.
+NotBlank={0} 공백이 안됩니다.
+Range={0}, {2} ~ {1} 허용
+Max={0}, 최대 {1}
+```
+
+#### Bean Validation 에러코드 순서
+1.NotBlank.item.itemName,
+2.NotBlank.itemName,
+3.NotBlank.java.lang.String,
+4.NotBlank
+
+- 생성된 메시지 코드 순서대로 messageSource에서 메시지 찾기
+- 애노테이션 message 속성 사용 -> ex)NotBlank(message = "공백! {0}")
+- 라이브러리가 제공하는 기본값 사용 -> 공백일 수 없습니다.
+
+
+
+
+
 
 
 
