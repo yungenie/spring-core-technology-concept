@@ -1315,16 +1315,12 @@ public class Item {
 public class ValidationItemControllerV3 {
 
     private final ItemRepository itemRepository;
+    
+     /**
+     * Bean Validation 적용 - @Validated
+     */
     @PostMapping("/add")
     public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-
-        //특정 필드가 아닌 복합 룰 검증
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
-            if (resultPrice < 10000) {
-                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
-            }
-        }
 
         //검증에 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
@@ -1357,7 +1353,7 @@ public class ValidationItemControllerV3 {
 
 
 
-### Bean Validation 에러코드
+### Bean Validation 에러코드 (필드)
 
 ```
 Field error in object 'item' on field 'itemName': rejected value []; codes [NotBlank.item.itemName,NotBlank.itemName,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [item.itemName,itemName]; arguments []; default message [itemName]]; default message [공백은 불가 합니다.] 
@@ -1383,9 +1379,70 @@ Max={0}, 최대 {1}
 - 라이브러리가 제공하는 기본값 사용 -> 공백일 수 없습니다.
 
 
+### Bean Validation 에러코드 (오브젝트)
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/22e1a47e-7aab-4646-a232-b3f6457d9d89">
+- @Validated 애노테이션은 특정 필드에 처리가 된다. 
+- ObjectError는 어떻게 처리할 수 있을까?
 
+```java
+@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총 합이 만원 이상이여야 합니다.")
+@Data
+public class Item {
 
+    private Long id;
 
+    @NotBlank(message = "공백은 불가 합니다.")
+    private String itemName;
+
+    @NotNull(message = "입력해주세요.")
+    @Range(min = 1000, max = 1000000, message = "1000~1000000 사이값 입니다.")
+    private Integer price;
+
+    @NotNull
+    @Max(value = 9999, message = "최대값은 9999 입니다.")
+    private Integer quantity;
+
+    public Item() {
+    }
+
+    public Item(String itemName, Integer price, Integer quantity) {
+        this.itemName = itemName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+}
+```
+- @ScriptAssert()를 이용해서 필드의 조합으로 처리할 수 있습니다.
+- 그러나 @ScriptAssert는 제약이 많고 복잡해서 Object error는 직접 자바 코드로 처리를 권장합니다.
+
+```java
+     /**
+     * Bean Validation 적용 - @Validated
+     */
+    @PostMapping("/add")
+    public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        //특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
+            }
+        }
+
+        //검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            log.info("errors={} ", bindingResult);
+            return "validation/v3/addForm";
+        }
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v3/items/{itemId}";
+    }
+```
 
 
 
