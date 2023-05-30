@@ -875,8 +875,8 @@ max= {0} 까지 허용합니다.
 
 <br>
 
-#### 오류 코드와 메시지 처리4
-##### MessageCodesResolver 동작 방식
+### 오류 코드와 메시지 처리4
+#### MessageCodesResolver 동작 방식
 
 ```java
 public class MessageCodesResolverTest {
@@ -915,7 +915,7 @@ public class MessageCodesResolverTest {
 - MessageCodesResolver는 검증 오류 메시지 코드를 생성하는 인터페이스 입니다.
 - DefaultMessageCodesResolver가 MessageCodesResolver의 구현체입니다.
 
-##### DefaultMessageCodesResolver의 메시지 생성 규칙 및 동작방식
+#### DefaultMessageCodesResolver의 메시지 생성 규칙 및 동작방식
 - 필드 오류
     - 필드 오류의 경우 다음 순서로 4가지 메시지 코드 생성
     
@@ -945,8 +945,8 @@ public class MessageCodesResolverTest {
 - bindingResult.rejectValue(), reject()는 내부에서 MessageCodesResolver를 사용합니다. 
 - MessageCodesResolver는 FieldError, ObejctError를 호출해서 String[] 오류 코드 배열에 생성된 순서대로 오류 코드를 반환해줍니다. 
 
-#### 오류 코드와 메시지 처리5
-##### errors.properties 설정
+### 오류 코드와 메시지 처리5
+#### errors.properties 설정
 - 오류 코드 레벨별로 설정 후 테스트 확인  
 ```
 #==ObjectError==
@@ -984,7 +984,7 @@ max= {0} 까지 허용합니다.
 #### 결과확인
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/821b3bbd-43e3-48fc-8636-badcc8e3e6d0">
 
-##### ValidationUtils 적용
+#### ValidationUtils 적용
 ```java
 if (!StringUtils.hasText(item.getItemName())) {
     bindingResult.rejectValue("itemName", "required");
@@ -1005,8 +1005,8 @@ ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required")
 > 4. th:errors에서 메시지 코드들로 메시지를 순서대로 메시지에서 찾고, 노출
 
 
-#### 오류 코드와 메시지 처리6
-##### 스프링이 직접 만든 오류 메시지 처리
+### 오류 코드와 메시지 처리6
+#### 스프링이 직접 만든 오류 메시지 처리
 <img width="590" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/663c78c3-8e2f-4864-a4c1-ef40764bd946">
 
 - 가격 필드에 문자를 입력 후 저장을 합니다. 
@@ -1023,7 +1023,7 @@ Field error in object 'item' on field 'price': rejected value [qqqq]; codes [typ
     - typeMismatch.java.lang.Integer,
     - typeMismatch
 
-##### errors.properties 설정
+#### errors.properties 설정
 ```
 #추가 (스프링이 제공해주는 오류 활용)
 typeMismatch.java.lang.Integer=숫자를 입력해주세요.
@@ -1034,8 +1034,8 @@ typeMismatch=타입 오류입니다.
 #### 결과확인
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/6e06ce4e-9af0-4d2f-af35-582f4fed63f2">
 
-#### Validator 분리1
-##### 복잡한 검증 로직을 별도로 분리하자
+### Validator 분리1
+#### 복잡한 검증 로직을 별도로 분리하자
 
 ```java
 import hello.itemservice.domain.item.Item;
@@ -1112,14 +1112,14 @@ public class ValidationItemControllerV2 {
 }
 
 ``` 
-##### 결과확인 
+#### 결과확인 
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/b25f405f-2b30-4430-a617-cf8618f98cf4">
 
-#### Validator 분리2
+### Validator 분리2
 - Validator인터페이스를 구현하여 검증로직에 직접 불러서 사용했습니다.
 - Validator 애노테이션을 사용해서 스프링의 추가적인 도움을 받을 수 있습니다.
 
-##### WebDataBinder를 통해서 사용하기
+#### WebDataBinder를 통해서 사용하기
 
 ```java
 @Slf4j
@@ -1163,3 +1163,15 @@ public class ValidationItemControllerV2 {
 
 #### 결과확인
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/34ca1bee-e2d1-432a-a219-bf8a3ff38ba3">
+
+## 검증2 - Bean Validation
+### Bean Validation
+- validator2에서 검증기를 매번 도메인마다 코드로 작성하는 것이 상당히 번거롭습니다. 
+- 빈 값인지, 특정 크기를 넘는 지 아닌지에 대한 검증 로직을 애노테이션으로 처리할 수 있게 공통화, 표준화한 것이 Bean Validation 입니다.
+- Bean Validation는 구현체가 아니라 인터페이스로 자바에서 제공하는 표준 기술입니다. 일반적으로 사용하는 구현체는 하이버네이트 Validator 입니다.
+
+
+
+
+
+
