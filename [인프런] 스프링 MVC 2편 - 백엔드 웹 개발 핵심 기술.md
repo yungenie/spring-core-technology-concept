@@ -9,6 +9,7 @@
 - [타임리프 스프링 통합과 폼](#타임리프-스프링-통합과-폼) 
 - [메시지, 국제화](#메시지-국제화) 
 - [검증1 Validation](#검증1---validation)
+- [검증2 Bean Validation](#검증2---bean-validation) 
 
 <br>
 
