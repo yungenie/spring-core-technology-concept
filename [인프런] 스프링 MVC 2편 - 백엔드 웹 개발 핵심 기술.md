@@ -1374,15 +1374,16 @@ Max={0}, 최대 {1}
 3.NotBlank.java.lang.String  
 4.NotBlank   
 
-- 생성된 메시지 코드 순서대로 messageSource에서 메시지 찾기
-- 애노테이션 message 속성 사용 -> ex)NotBlank(message = "공백! {0}")
-- 라이브러리가 제공하는 기본값 사용 -> 공백일 수 없습니다.
+- 생성된 메시지 코드 순서대로 messageSource에서 메시지 찾기 
+- 애노테이션 message 속성 사용 -> ex)NotBlank(message = "공백! {0}") 
+- 라이브러리가 제공하는 기본값 사용 -> 공백일 수 없습니다. 
 
 
 ### Bean Validation 에러코드 (오브젝트)
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/22e1a47e-7aab-4646-a232-b3f6457d9d89">
-- @Validated 애노테이션은 특정 필드에 처리가 된다. 
-- ObjectError는 어떻게 처리할 수 있을까?
+
+- @Validated 애노테이션은 특정 필드에 처리가 된다.  
+- ObjectError는 어떻게 처리할 수 있을까? 
 
 ```java
 @ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총 합이 만원 이상이여야 합니다.")
