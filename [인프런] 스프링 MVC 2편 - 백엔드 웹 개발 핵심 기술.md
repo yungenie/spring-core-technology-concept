@@ -1373,10 +1373,10 @@ Max={0}, 최대 {1}
 ```
 
 #### Bean Validation 에러코드 순서
-1.NotBlank.item.itemName,
-2.NotBlank.itemName,
-3.NotBlank.java.lang.String,
-4.NotBlank
+1.NotBlank.item.itemName  
+2.NotBlank.itemName  
+3.NotBlank.java.lang.String
+4.NotBlank   
 
 - 생성된 메시지 코드 순서대로 messageSource에서 메시지 찾기
 - 애노테이션 message 속성 사용 -> ex)NotBlank(message = "공백! {0}")
