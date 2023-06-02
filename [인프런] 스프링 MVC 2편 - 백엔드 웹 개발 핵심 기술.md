@@ -1463,3 +1463,47 @@ public class Item {
 #### 참고
 - @ModelAttribute는 HTTP 요청파라미터(URL쿼리스트링, Post Form)을 다룰 때 사용합니다.
 - @ReuqestBody는 HTTP Body의 데이터를 객체로 변환할 때 사용합니다. 주로 API JSON 요청을 다룰 때 사용합니다.
+
+#### api 3가지
+- 성공
+
+import hello.itemservice.web.validation.form.ItemSaveForm;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@RestController
+@RequestMapping("/validation/api/items")
+public class ValidationItemApiController {
+
+    @PostMapping("/add")
+    public Object addItem(@RequestBody @Validated ItemSaveForm form, BindingResult bindingResult) {
+
+        log.info("API 컨트롤러 호출");
+
+        if (bindingResult.hasErrors()) {
+            log.info("검증 오류 발생 errors={}", bindingResult);
+            return bindingResult.getAllErrors(); // FieldError, ObjectError 모두 반환
+        }
+
+        log.info("성공 로직 실행");
+        return form;
+    }
+}
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/9d6421d1-bb54-4f81-be02-8518d8e0a6c3">
+
+
+- 실패 요청
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d4f010a9-d660-4939-9c0f-30e5cc20a25b">
+
+- 검증 오류 요청
+<img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d054193c-9b44-4309-9225-9d0b2228098e">
+
+#### @ModelAttribute vs @ReuqestBody 검증 처리
+- @ModelAttribute 특정 필드 타입에 맞지 않는 오류가 발생해도 나머지 필드는 정상 처리할 수 있다.
+- @ReuqestBody는 필드 단위로 적용되는 것이 아니라, 전체 객체 단위로 적용
+
+
+
