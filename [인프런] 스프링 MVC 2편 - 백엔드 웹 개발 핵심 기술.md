@@ -1465,8 +1465,8 @@ public class Item {
 - @ReuqestBody는 HTTP Body의 데이터를 객체로 변환할 때 사용합니다. 주로 API JSON 요청을 다룰 때 사용합니다.
 
 #### api 3가지
-- 성공
 
+```java
 import hello.itemservice.web.validation.form.ItemSaveForm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -1492,8 +1492,9 @@ public class ValidationItemApiController {
         return form;
     }
 }
+```
+- 성공
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/9d6421d1-bb54-4f81-be02-8518d8e0a6c3">
-
 
 - 실패 요청
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d4f010a9-d660-4939-9c0f-30e5cc20a25b">
