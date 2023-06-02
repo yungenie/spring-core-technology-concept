@@ -1452,3 +1452,9 @@ public class Item {
 
 ### Form 전송 객체 개발
 - saveForm, saveRepository, updateForm, updateRepository 따로 생성해서 개발합니다.
+
+#### 하이버네이트 Validator 관련 링크
+- 검증 애노테이션 모음 : https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-defineconstraints-spec
+- @Email null 허용 : https://bellog.tistory.com/134
+
+
