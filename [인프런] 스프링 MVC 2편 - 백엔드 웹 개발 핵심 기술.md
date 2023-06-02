@@ -1464,7 +1464,7 @@ public class Item {
 - @ModelAttribute는 HTTP 요청파라미터(URL쿼리스트링, Post Form)을 다룰 때 사용합니다.
 - @ReuqestBody는 HTTP Body의 데이터를 객체로 변환할 때 사용합니다. 주로 API JSON 요청을 다룰 때 사용합니다.
 
-#### api 3가지
+#### API 결과 3가지 (검증관련)
 
 ```java
 import hello.itemservice.web.validation.form.ItemSaveForm;
@@ -1485,7 +1485,7 @@ public class ValidationItemApiController {
 
         if (bindingResult.hasErrors()) {
             log.info("검증 오류 발생 errors={}", bindingResult);
-            return bindingResult.getAllErrors(); // FieldError, ObjectError 모두 반환
+            return bindingResult.getAllErrors(); // FieldError와 ObjectError 모두 반환
         }
 
         log.info("성공 로직 실행");
@@ -1493,18 +1493,21 @@ public class ValidationItemApiController {
     }
 }
 ```
-- 성공
+- 성공 요청 : 성공 
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/9d6421d1-bb54-4f81-be02-8518d8e0a6c3">
-
-- 실패 요청
+	
+- 실패 요청 : JSON을 객체로 생성하는 것 자체가 실패함. 
+	- 객체를 만들지 못하기 때문에 컨트롤러 자체가 호출되지 않고 예외가 발생하며 Validator도 실행되지 않는다. 
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d4f010a9-d660-4939-9c0f-30e5cc20a25b">
+	
 
-- 검증 오류 요청
+- 검증 오류 요청 : JSON을 객체로 생성하는 것을 성공했고, 검증에서 실패함.  
+	- HttpMessageConverter는 성공하지만 검증(Validator)에서 오류가 발생한다. 
 <img width="50%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d054193c-9b44-4309-9225-9d0b2228098e">
 
 #### @ModelAttribute vs @ReuqestBody 검증 처리
-- @ModelAttribute 특정 필드 타입에 맞지 않는 오류가 발생해도 나머지 필드는 정상 처리할 수 있다.
-- @ReuqestBody는 필드 단위로 적용되는 것이 아니라, 전체 객체 단위로 적용
+- @ModelAttribute : 필드 단위로 정교하게 바인딩이 적용됩니다. 특정 필드 타입에 맞지 않는 오류가 발생해도 나머지 필드는 정상 처리할 수 있다. Validator를 사용한 검증도 적용할 수 있다. (필드 단위로 세밀하게 적용)
+- @ReuqestBody는 : HttpMessageConverter단계에서 JSON 데이터를 객체로 변경하지 못하면 이후 단계 자체가 진행되지 않고 예외가 발생한다. 컨트롤러도 호출되지 않고, Validator도 적용할 수 없다. (필드 단위로 적용되는 것이 아니라, 전체 객체 단위로 적용)
 
 
 
