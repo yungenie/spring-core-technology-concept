@@ -1457,4 +1457,9 @@ public class Item {
 - 검증 애노테이션 모음 : https://docs.jboss.org/hibernate/validator/6.2/reference/en-US/html_single/#validator-defineconstraints-spec
 - @Email null 허용 : https://bellog.tistory.com/134
 
+### Bean Validation HTTP 메시지 컨버터
+- @Valid, @Validated는 HttpMessageConverter(@RequestBody)에도 적용할 수 있습니다.
 
+#### 참고
+- @ModelAttribute는 HTTP 요청파라미터(URL쿼리스트링, Post Form)을 다룰 때 사용합니다.
+- @ReuqestBody는 HTTP Body의 데이터를 객체로 변환할 때 사용합니다. 주로 API JSON 요청을 다룰 때 사용합니다.
