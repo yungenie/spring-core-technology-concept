@@ -1513,3 +1513,4 @@ public class ValidationItemApiController {
 <br>
 
 ## 로그인 처리1 - 쿠키,세션
+### 로그인 처리하기 - 쿠키 
