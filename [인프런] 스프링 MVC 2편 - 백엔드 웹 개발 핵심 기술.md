@@ -10,6 +10,7 @@
 - [메시지, 국제화](#메시지-국제화) 
 - [검증1 Validation](#검증1---validation)
 - [검증2 Bean Validation](#검증2---bean-validation) 
+- [로그인 처리1 - 쿠키,세션](#로그인-처리1---쿠키-세션)
 
 <br>
 
@@ -1509,5 +1510,6 @@ public class ValidationItemApiController {
 - @ModelAttribute : 필드 단위로 정교하게 바인딩이 적용됩니다. 특정 필드 타입에 맞지 않는 오류가 발생해도 나머지 필드는 정상 처리할 수 있다. Validator를 사용한 검증도 적용할 수 있다. `(필드 단위로 세밀하게 적용)`
 - @ReuqestBody는 : HttpMessageConverter단계에서 JSON 데이터를 객체로 변경하지 못하면 이후 단계 자체가 진행되지 않고 예외가 발생한다. 컨트롤러도 호출되지 않고, Validator도 적용할 수 없다. `(필드 단위로 적용되는 것이 아니라, 전체 객체 단위로 적용)`
 
+<br>
 
-
+## 로그인 처리1 - 쿠키,세션
