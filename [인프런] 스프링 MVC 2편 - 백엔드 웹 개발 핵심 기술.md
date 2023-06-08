@@ -1514,3 +1514,64 @@ public class ValidationItemApiController {
 
 ## 로그인 처리1 - 쿠키,세션
 ### 로그인 처리하기 - 쿠키 
+#### 로그인 상태를 어떻게 유지할 수 있을까?
+##### 쿠키
+- 서버에서 로그인에 성공하면 HTTP 응답에 쿠키를 담아서 브라우저에 전달합니다. 그러면 브라우저는 앞으로 해당 쿠키를 지속해서 보내줍니다.
+
+##### 쿠키 생성
+- 로그인
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/dc272f62-b763-4c79-97aa-803a583ea966">
+
+##### 클라이언트 쿠키 전달1
+- 로그인 이후 welcome 페이지 접근
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/7cb3716b-29c7-407d-8ffc-dc020ab1f9d3">
+
+##### 클라이언트 쿠키 전달2
+- 모든 요청에 쿠키 정보 자동 포함
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/11ec6bad-d81c-487e-8348-495242cf44db">
+
+##### 쿠키 종류
+- 쿠키에는 영속 쿠키와 세션 쿠키가 있습니다.
+	- 영속 쿠키 : 만료 날짜를 입력하면 해당 날짜까지 유지
+	- 세션 쿠키 : 만료 날짜를 생략하면 브라우저 종료시 까지만 유지
+- 브라우저 종료시 로그아웃이 되길 기대하므로, 세션 쿠키를 사용합니다.
+
+##### 쿠키 생성 로직
+```java
+    @PostMapping("/login")
+    public String login(@Valid @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult, HttpServletResponse response) {
+
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        if (loginMember == null) {
+            bindingResult.reject("loginFail"); // errorMessage -> errors.properties
+            return "login/loginForm";
+        }
+
+        //로그인 성공 처리
+
+        //쿠키 생성 로직 - 쿠키에 시간 정보를 주지 않으면 세션 쿠키(브라우저 종료시 모두 종료)
+        Cookie idCookie = new Cookie("memberId", String.valueOf(loginMember.getLoginId()));
+        response.addCookie(idCookie);
+
+        return "redirect:/";
+
+    }
+```
+- 로그인에 성공하면 쿠키를 생성하고 `HttpServletResponse`에 담습니다. 웹 브라우저는 브라우저 종료 전까지 회원의 쿠키 값을 서버에 계속 보내줍니다.
+
+- 로그인 후 (Response Header)
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/4ee827ca-6cf2-47cd-b277-b5eb53031403">
+
+- 로그인 후 새로고침 (Request Header)
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/3fa8ac66-113d-4c15-911e-1b6656331c23">
+
+- 로그인 후 새로고침 (개발자 도구 - Application>Storage>Cookies)
+<img width="70&" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/32845c7a-a80e-4258-9786-381d1161f8cc">
+
+
+
+
