@@ -1537,7 +1537,20 @@ public class ValidationItemApiController {
 - 브라우저 종료시 로그아웃이 되길 기대하므로, 세션 쿠키를 사용합니다.
 
 ##### 쿠키 생성 로직
+
 ```java
+@Slf4j
+@Controller
+@RequiredArgsConstructor
+public class LoginController {
+
+    private final LoginService loginService;
+
+    @GetMapping("/login")
+    public String loginForm(@ModelAttribute("loginForm") LoginForm form) {
+        return "login/loginForm";
+    }
+
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute("loginForm") LoginForm form, BindingResult bindingResult, HttpServletResponse response) {
 
@@ -1554,13 +1567,14 @@ public class ValidationItemApiController {
         //로그인 성공 처리
 
         //쿠키 생성 로직 - 쿠키에 시간 정보를 주지 않으면 세션 쿠키(브라우저 종료시 모두 종료)
-        Cookie idCookie = new Cookie("memberId", String.valueOf(loginMember.getLoginId()));
+        Cookie idCookie = new Cookie("memberId", String.valueOf(loginMember.getId()));
         response.addCookie(idCookie);
 
         return "redirect:/";
-
     }
+}    
 ```
+
 - 로그인에 성공하면 쿠키를 생성하고 `HttpServletResponse`에 담습니다. 웹 브라우저는 브라우저 종료 전까지 회원의 쿠키 값을 서버에 계속 보내줍니다.
 
 - 로그인 후 (Response Header)
@@ -1570,8 +1584,81 @@ public class ValidationItemApiController {
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/3fa8ac66-113d-4c15-911e-1b6656331c23">
 
 - 로그인 후 새로고침 (개발자 도구 - Application>Storage>Cookies)
-<img width="70&" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/32845c7a-a80e-4258-9786-381d1161f8cc">
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/32845c7a-a80e-4258-9786-381d1161f8cc">
 
+##### 홈 - 로그인 처리
+```java
+@Slf4j
+@Controller
+@RequiredArgsConstructor
+public class HomeController {
 
+    private final MemberRepository memberRepository;
 
+    @GetMapping("/")
+    public String homeLogin(@CookieValue(name = "memberId", required = false) Long memberId, Model model) {
+
+        if (memberId == null) {
+            return "home"; // 로그인 쿠키가 없는 사용자
+        }
+
+        // 로그인
+        Member loginMember = memberRepository.findById(memberId);
+        if (loginMember == null) {
+            return "home"; // 로그인 쿠키가 있어도 회원이 아닌 사용자
+        }
+        model.addAttribute("member", loginMember);
+        return "loginHome"; // 로그인 쿠키가 있는 회원
+    }
+}
+```
+
+- 로그인 사용자 전용 홈
+```html
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link th:href="@{/css/bootstrap.min.css}"
+          href="../css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container" style="max-width: 600px">
+    <div class="py-5 text-center">
+        <h2>홈 화면</h2>
+    </div>
+
+    <h4 class="mb-3" th:text="|로그인: ${member.name}|">로그인 사용자 이름</h4>
+
+    <hr class="my-4">
+
+    <div class="row">
+        <div class="col">
+            <button class="w-100 btn btn-secondary btn-lg" type="button"
+                    th:onclick="|location.href='@{/items}'|">
+                상품 관리
+            </button>
+        </div>
+        <div class="col">
+            <form th:action="@{/logout}" method="post">
+                <button class="w-100 btn btn-dark btn-lg" onclick="location.href='items.html'" type="submit">
+                    로그아웃
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+</div> <!-- /container -->
+
+</body>
+</html>
+```
+
+##### 로그아웃 기능
+- 세션 쿠키이므로 웹 브라우저 종료시 서버에서 해당 쿠키의 종료날짜를 0으로 지정 
+
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d51c9515-60fc-453d-b6c9-2f8f330bac5e">
 
