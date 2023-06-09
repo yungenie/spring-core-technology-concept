@@ -1930,23 +1930,23 @@ public class HomeController {
 ```
 #### 결과 확인
 - 첫 로그인
-	- 서버에서 세션ID 생성 및 저장, Response Header에 담아 응답, (확인필요) Request 담기는 지?
+	- 서버에서 세션ID 생성 및 저장, Response Header에 담아 응답, 클라이언트는 브라우저 내부 쿠키 저장소에 보관.
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/b969c40f-9bba-41c3-9991-99e66637d803">
 	
 - 로그인 후 새로고침 
-	- Request Header의 Cookie에 세션ID 담겨서 요청옴 
+	- 쿠키 저장소에서 세션ID 조회해서 Request Header의 Cookie에 담겨 요청함.
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/f0e158e8-d366-4926-8d22-71fe641ed7c9">
 
 - 로그아웃 
 	- 서버에서는 세션ID 삭제되고, Response Header에도 삭제된다. Request Header에는 삭제되지 않는다.  
 
-- 다시 로그인 
+- 다시 로그인  
+ 	- Response Header에 새로운 세션ID 생성,  클라이언트는 브라우저 내부 쿠키 저장소에 보관. 
+	- Request Header에 이전 세션ID 남아있음  
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/628e7c7f-4976-4f0b-b727-9de91bedd1f0">
-	- Response Header에 새로운 세션ID 생성 
-	- Request Header에 이전 세션ID 남아있음 
-	 
+
 - 로그인 후 새로고침
-	- Response Header에 세션ID 사라지고, Request Header에 만들어진 세션ID 담김.
+	- 쿠키 저장소에서 새로운 세션ID 조회해서 Request Header의 Cookie에 담겨 요청함.
 
 > 브라우저가 종료되지 않은 상태에서 로그인 하면 세션ID 생성/새로고침 세션ID로 유지/로그아웃하면 세션ID 삭제, 다시 로그인하면 새로운 세션ID 생성/새로고침 새로운 세션ID로 유지/로그아웃하면 새로운 세션ID 삭제로 된다. 결국 로그아웃 하기 전까지는 생성된 세션ID로 유지합니다. 
 
