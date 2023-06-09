@@ -1933,18 +1933,18 @@ public class HomeController {
 	- 서버에서 세션ID 생성 및 저장, Response Header에 담아 응답, (확인필요) Request 담기는 지?
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/b969c40f-9bba-41c3-9991-99e66637d803">
 	
-- 로그인 후 새로고침
-	- Request Header의 Cookie에 세션ID 담겨서 요청옴
+- 로그인 후 새로고침 
+	- Request Header의 Cookie에 세션ID 담겨서 요청옴 
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/f0e158e8-d366-4926-8d22-71fe641ed7c9">
 
-- 로그아웃
-	- 서버에서는 세션ID 삭제되고, Response Header에도 삭제된다. Request Header에는 삭제되지 않는다. 
+- 로그아웃 
+	- 서버에서는 세션ID 삭제되고, Response Header에도 삭제된다. Request Header에는 삭제되지 않는다.  
 
-- 다시 로그인
+- 다시 로그인 
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/628e7c7f-4976-4f0b-b727-9de91bedd1f0">
-	- Response Header에 새로운 세션ID 생성
-	- Request Header에 이전 세션ID 남아있음
-	
+	- Response Header에 새로운 세션ID 생성 
+	- Request Header에 이전 세션ID 남아있음 
+	 
 - 로그인 후 새로고침
 	- Response Header에 세션ID 사라지고, Request Header에 만들어진 세션ID 담김.
 
