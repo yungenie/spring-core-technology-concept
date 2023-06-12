@@ -228,6 +228,15 @@
 
 ## HTTP 헤더1 - 일반 헤더
 
+### 인증
+- Authorization : 클라이언트 인증 정보를 서버에 전달
+	- 인증하는 여러가지 매커니즘이 있습니다.
+	- 매커니즘 마다 들어가는 값이 다릅니다. (JWT, OAuth 등의 값)
+- WWW-Authenticate : 리소스 접근시 필요한 인증 방법 정의
+	- 401 Unauthorized 응답과 함께 WWW-Authenticate 사용해야합니다.
+	- WWW-Authenticate: Newauth realm="apps", type=1, title="Login to \"apps\"", Basic realm="simple"
+	- 위 정보를 확인해서 인증 정보를 만들어주라고 서버에서 클라이언트로 응답합니다. 
+
 ### 쿠키
 - **HTTP 프로토콜**의 **특성**이자 **약점**을 `보완`하기 위해서 쿠키 또는 세션을 사용합니다.
 - 기본적으로 HTTP 프로토콜 환경은 "connectionless, stateless"한 특성을 가지기 때문에 서버는 클라이언트가 누구인지 매번 확인해야합니다. 
