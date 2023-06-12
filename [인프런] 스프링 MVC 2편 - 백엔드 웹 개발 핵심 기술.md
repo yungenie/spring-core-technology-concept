@@ -1956,4 +1956,167 @@ public class HomeController {
 - 프로젝트마다 세션을 직접 개발하는 것이 상당히 번거롭습니다. 그래서 서블릿이 공식 지원하는 세션을 사용하면 됩니다. 
 
 
+### 로그인 처리하기 - 서블릿 HTTP 세션1
+- 세션이라는 개념은 대부분의 웹 애플리케이션에 필요한 것이다. 어쩌면 웹이 등장하면서 부터 나온 문제이다.
+- 서블릿은 세션을 위해 `HttpSession`이라는 기능을 제공합니다.
+- 앞에서 직접 구현했던 세션을 구현할 필요 없이 제공하는 기능으로 사용할 수 있습니다.
+
+#### HttpSession 소개
+- 서블릿을 통해 `HttpSession`을 생성하면 쿠키를 생성합니다. 쿠키 이름은 `JSESSIONID`이고, 값은 추정 불가능한 랜덤 값입니다.
+
+##### SessionConst
+```java
+public interface SessionConst {
+    String LOGIN_MEMBER = "loginMember";
+}
+```
+- HttpSession에 데이터를 보관하고 조회할 때, 같은 이름이 중복되어 사용되므로 상수를 하나 정의합니다. (Key 정의)
+
+##### LoginController - login, logout
+```java
+import hello.login.domain.login.LoginService;
+import hello.login.domain.member.Member;
+import hello.login.web.session.SessionConst;
+import hello.login.web.session.SessionManager;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+
+@Slf4j
+@Controller
+@RequiredArgsConstructor
+public class LoginController {
+
+    private final LoginService loginService;
+    private final SessionManager sessionManager;
+
+    @GetMapping("/login")
+    public String loginForm(@ModelAttribute("loginForm") LoginForm form) {
+        return "login/loginForm";
+    }
+	
+    /**
+     * 서블릿이 제공하는 HttpSession
+     * - JSESSIONID (추정 불가능한 랜덤 값)
+     */
+    @PostMapping("/login")
+    public String login(@Valid @ModelAttribute LoginForm form, BindingResult
+            bindingResult, HttpServletRequest request) {
+        log.info("login");
+
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        log.info("login? {}", loginMember);
+
+        if (loginMember == null) {
+            bindingResult.reject("loginFail"); // errorMessage -> errors.properties
+            return "login/loginForm";
+        }
+
+        //로그인 성공 처리
+        //세션이 있으면 기존 세션 반환, 없으면 신규 세션 생성 반환
+        HttpSession session = request.getSession();
+        //세션에 로그인 회원 정보 보관
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember); // 여러 값을 set() 메서드에 저장할 수 있음. 메모리에 보관됨.
+
+        return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        // 세션이 있으면 기존 세션 반환, 없으면 null 반환
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate(); // 세션을 제거합니다.
+        }
+        return "redirect:/";
+    }
+}
+```
+
+- 로그인 : 세션 생성과 조회
+	- request.getSession()을 사용하면 됩니다. 
+	- public HttpSession getSession(boolean create);
+		- create 옵션 (true/false)
+		- `true` : 세션이 있으면 기존 세션 반환, 없으면 새로운 세션 생성 및 반환 *(default)*
+		- `false` : 세션이 있으면 기존 세션 반환, 없으면 null 반환
+	- 로그인 시 세션 처리 및 사용자 정보를 담아 홈으로 이동합니다. 
+- 로그아웃 : 세션 삭제
+	- session.invalidate()로 세션을 제거합니다. 
+
+
+> 주의사항! - 에러해결
+> @ModelAttribute LoginForm 도메인 객체에 매핑되는 생성자가 있어야 함. 
+> Lombok @Builder 테스트 한다고 @AllArgsConstructor 주석했더니 필드와 값 매핑이 전혀 안되서 오류 났었음.
+
+##### HomeController - home
+
+```java
+import hello.login.domain.member.Member;
+import hello.login.web.session.SessionConst;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+
+@Slf4j
+@Controller
+@RequiredArgsConstructor
+public class HomeController {
+
+    /**
+     * 서블릿이 제공하는 HttpSession
+     * - JSESSIONID (추정 불가능한 랜덤 값)
+     */
+    @GetMapping("/")
+    public String homeLogin(HttpServletRequest request, Model model) {
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "home";
+        }
+
+        Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+        //세션에 회원 데이터가 없으면 home
+        if (loginMember == null) {
+            return "home";
+        }
+        log.info("안녕하세요" + loginMember + "고객님");
+
+        //세션이 유지되면 로그인으로 이동
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+}
+```
+- `request.getSession(false)` : 비회원 및 로그인 하지 않은 사용자에게 세션을 생성하지 않아야 한다.
+- `session.getAttribute(SessionConst.LOGIN_MEMBER)` : 로그인 시점에 세션에 보관한 회원 객체를 찾습니다. 
+
+##### 결과
+- 첫 로그
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/423d274c-d4b6-4316-9652-60465bc9a5c7">
+
+- 새로고침
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/364469fd-5c99-4868-a303-b76b8f3a3b48">
+
+
 
