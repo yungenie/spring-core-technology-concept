@@ -2149,7 +2149,9 @@ public class HomeController {
 #### TrackingModes
 
 <img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/f185d35c-3b80-49e3-8c94-da066b953b13">
+
 - URL에 다음과 같이 `JSESSIONID`를 포함하고 있는 것을 확인할 수 있습니다. 
+- NetWork에서 Request Header에 Locator에 포함되고 있습니다. 
 - 이유 : 웹 브라우저가 쿠키를 지원하지 않을 때 쿠키 대신 URL을 통해 세션을 유지하는 방법입니다. 
 - 이 방법은 URL이 세션값을 계속 포함해서 전달합니다. 타임리프 같은 템플릿 엔진을 통해서 링크를 걸면 URL에 자동으로 포함해줍니다. 서버 입장에서는 웹 브라우저가 쿠키를 지원하는지 하지 않는지 최초에 판단을 못하므로, 쿠키값도 URL에 포함해 함께 전달합니다.
 - URL 전달방식은 끄고, 쿠키를 통해서만 세션을 유지하고 싶으면 다음과 같은 옵션을 넣습니다. (노출 되지 않음)
