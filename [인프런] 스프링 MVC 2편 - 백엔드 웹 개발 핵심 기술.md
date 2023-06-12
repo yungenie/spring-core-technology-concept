@@ -2056,9 +2056,9 @@ public class LoginController {
 	- session.invalidate()로 세션을 제거합니다. 
 
 
-> 주의사항! - 에러해결
-> @ModelAttribute LoginForm 도메인 객체에 매핑되는 생성자가 있어야 함. 
-> Lombok @Builder 테스트 한다고 @AllArgsConstructor 주석했더니 필드와 값 매핑이 전혀 안되서 오류 났었음.
+> 주의사항! - 에러해결<br>
+> @ModelAttribute LoginForm 도메인 객체에 매핑되는 생성자가 있어야 함. <br>
+> Lombok @Builder 테스트 한다고 @AllArgsConstructor 주석했더니 필드와 값 매핑이 전혀 안되서 오류 났었음. <br>
 
 ##### HomeController - home
 
