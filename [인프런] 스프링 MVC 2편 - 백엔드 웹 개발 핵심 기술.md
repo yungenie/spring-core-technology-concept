@@ -2186,5 +2186,5 @@ session.setMaxInactiveInterval(1800);
 ```
 - 특정 기능/페이지 등등 세션 단위를 설정해줘야 하는 경우, HttpSession의 `setMaxInactiveInterval` 메서드로 단위를 지정해주면 됩니다. 
 
-> 정리 : 글로벌 설정 또는 특정 세션 단위로 설정을 통해 session.getLastAccessedTime() 최근 세션 접근 시간 이후로 > > timeout 시간이 지나면 WAS 내부에서 해당 세션을 제거합니다.
+> 정리 : 글로벌 설정 또는 특정 세션 단위로 설정을 통해 session.getLastAccessedTime() 최근 세션 접근 시간 이후로 timeout 시간이 지나면 WAS 내부에서 해당 세션을 제거합니다.
 > 또한, 실무 주의할 점은 최소한의 데이터만 보관을 해아합니다. 로그인ID, 로그인명 등등 정말 필요한 데이터만 보관을 해서 메모리 과부하 되지 않게 데이터 사용량을 최소화 하는 것이 중요합니다. 
