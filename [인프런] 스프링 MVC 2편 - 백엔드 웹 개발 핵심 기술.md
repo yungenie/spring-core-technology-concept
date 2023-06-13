@@ -11,6 +11,7 @@
 - [검증1 Validation](#검증1---validation)
 - [검증2 Bean Validation](#검증2---bean-validation) 
 - [로그인 처리1 - 쿠키,세션](#로그인-처리1---쿠키세션)
+- [로그인 처리1 - 쿠키,세션 정리](#로그인-처리1---쿠키세션-정리)
 
 <br>
 
@@ -2189,11 +2190,11 @@ session.setMaxInactiveInterval(1800);
 > 정리 : 글로벌 설정 또는 특정 세션 단위로 설정을 통해 session.getLastAccessedTime() 최근 세션 접근 시간 이후로 timeout 시간이 지나면 WAS 내부에서 해당 세션을 제거합니다.
 > 또한, 실무 주의할 점은 최소한의 데이터만 보관을 해아합니다. 로그인ID, 로그인명 등등 정말 필요한 데이터만 보관을 해서 메모리 과부하 되지 않게 데이터 사용량을 최소화 하는 것이 중요합니다. 
 
-### 로그인1,2 정리
+### 로그인 처리1 - 쿠키,세션 정리
 - 쿠키만으로 처리 (로그인 정보 도난, 변조, 유실)
 - 세션쿠키 (세션 저장소 직접 임의의 랜덤 아이디 UUID 생성 후 저장)
 - 서블릿이 제공하는 HttpSession JSESSIONID (직접 생성하지 않고, 서블릿을 통해서 바로 생성 후 매핑 가능)
 - 스프링이 제공하는 @SessionHttp (세션과 객체 매핑을 어노테이션으로 쉽게 처리)
 - 세션의 timeout 글로벌 설정
-- 어쨌든 세션 저장소를 직접 구현하든, HttpSession 기능을 이용해서 세션을 생성 및 관리 하든 Http Request/Reponse Header에 Cookie 속성에 담겨서 데이터 유지가 됩니다.
+- 세션 저장소를 직접 구현하든, HttpSession 기능을 이용해서 세션을 생성 및 관리 하든 Http Request/Reponse Header에 Set-Cookie/Cookie 속성에 담겨서 데이터 유지가 됩니다.
 
