@@ -2315,4 +2315,124 @@ RESPONSE [a89553d4-0d13-4400-803c-d2387edb7445][/]
 > 참고! 실무에서 HTTP 요청시 같은 요청의 로그에 모두 같은 식별자를 자동으로 남기는 방법은 logback mdc로 검색해보면 됩니다.
 
 
+### 서블릿 필터 - 인증체크
+#### 인증 체크 필터 - LogCheckFilter
+```java
+import hello.login.web.session.SessionConst;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.PatternMatchUtils;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
+@Slf4j
+public class LoginCheckFilter implements Filter {
+
+    private static final String[] whitelist = {"/", "/members/add", "/login", "/logout", "/css/*"}; // 접근 허용 URL
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestURI = httpRequest.getRequestURI();
+
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        try {
+            log.info("인증 체크 필터 시작 {}", requestURI);
+
+            if (isLoginCheckPath(requestURI)) {
+                log.info("인증 체크 로직 실행 {}", requestURI);
+                HttpSession session = httpRequest.getSession(false);
+                if (session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+                    log.info("미인증 사용자 요청 {}", requestURI);
+                    //로그인으로 redirect
+                    httpResponse.sendRedirect("/login?redirectURL=" + requestURI);
+                    return;
+                }
+            }
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            throw e; //예외 로깅 가능 하지만, 톰캣까지 예외를 보내주어야 함
+        } finally {
+            log.info("인증 체크 필터 종료 {} ", requestURI);
+        }
+    }
+
+    /**
+     * 화이트 리스트의 경우 인증 체크X
+     */
+    private boolean isLoginCheckPath(String requestURI) {
+        return !PatternMatchUtils.simpleMatch(whitelist, requestURI);
+    }
+}
+```
+#### WebConfig - loginCheckFilter
+```java
+import hello.login.web.filter.LogFilter;
+import hello.login.web.filter.LoginCheckFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.servlet.Filter;
+
+
+@Configuration
+public class WebConfig {
+
+    @Bean
+    public FilterRegistrationBean logFilter() {
+        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new LogFilter());
+        filterRegistrationBean.setOrder(1);
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean loginCheckFilter() {
+        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new LoginCheckFilter());
+        filterRegistrationBean.setOrder(2);
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
+
+}
+```
+#### RedirectURL 처리 - LoginController
+```java
+    /**
+     * 서블릿 필터 적용
+     */
+    @PostMapping("/login")
+    public String login(@Valid @ModelAttribute LoginForm form, BindingResult bindingResult,
+            @RequestParam(defaultValue = "/") String redirectURL,
+            HttpServletRequest request) {
+        log.info("login");
+
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm";
+        }
+
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        log.info("login? {}", loginMember);
+
+        if (loginMember == null) {
+            bindingResult.reject("loginFail"); // errorMessage -> errors.properties
+            return "login/loginForm";
+        }
+
+        //로그인 성공 처리
+        //세션이 있으면 기존 세션 반환, 없으면 신규 세션 생성 반환
+        HttpSession session = request.getSession();
+        //세션에 로그인 회원 정보 보관
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember); // 여러 값을 set() 메서드에 저장할 수 있음. 메모리에 보관됨.
+
+        return "redirect:" + redirectURL;
+    }
+```
+- 로그인 체크 필터에서, 미인증 사용자는 요청 경로를 포함해서 /login에 redirectURL 요청 파라미터를 추가 요청했다. 이 값을 사용해서 로그인 성공시 해당 경로로 고객을 redirect 한다.
