@@ -12,6 +12,7 @@
 - [검증2 Bean Validation](#검증2---bean-validation) 
 - [로그인 처리1 - 쿠키,세션](#로그인-처리1---쿠키세션)
 - [로그인 처리1 - 쿠키,세션 정리](#로그인-처리1---쿠키세션-정리)
+- [로그인 처리2 - 필터, 인터셉터](#로그인-처리2---필터-인터셉터)
 
 <br>
 
@@ -2197,4 +2198,121 @@ session.setMaxInactiveInterval(1800);
 - 스프링이 제공하는 @SessionHttp (세션과 객체 매핑을 어노테이션으로 쉽게 처리)
 - 세션의 timeout 글로벌 설정
 - 세션 저장소를 직접 구현하든, HttpSession 기능을 이용해서 세션을 생성 및 관리 하든 Http Request/Reponse Header에 Set-Cookie/Cookie 속성에 담겨서 데이터 유지가 됩니다.
+
+## 로그인 처리2 - 필터, 인터셉터
+- 필터 - 서블릿이 제공하는 기능
+- 인터셉터 - 스프링이 제공하는 기
+
+### 공통 관심 사항
+- 애플리케이션에서 여러 로직에서 공통으로 관심이 있는 것을 공통 관심사(Cross-cutting concern)이라고 합니다.
+- 공통 관심사를 스프링 AOP로도 해결할 수 있지만, 웹과 관련된 공통 관심사는 서블릿 필터 또는 스프링 인터셉터를 사용하는 게 좋습니다.
+- 웹과 관련된 공통 관심사란 HTTP의 헤더나 URL의 정보들이 필요할 때 서블릿 필터나 스프링 `HttpServeltRequest` 제공해줍니다.
+
+### 서블릿 필터 소개
+#### 필터 흐름
+``` HTTP 요청 -> WAS -> `필터` -> 서블릿(디스패처 서블릿) -> 컨트롤러```
+- 필터를 적용하면 필터가 호출된 다음에 서블릿이 호출됩니다.
+- 필터는 특정 URL패턴에 적용할 수 있습니다. /*이라고 하면 모든 요청에 필터가 적용됩니다.
+  
+#### 필터 제한
+```
+HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 컨트롤러 //로그인 사용자
+HTTP 요청 -> WAS -> 필터(적절하지 않은 요청이라 판단, 서블릿 호출X) //비 로그인 사용자
+```
+- 필터에서 적절하지 않는 요청이라고 판단하면 서블릿 호출하지 않습니다.
+- 비 로그인 사용자 같은 경우에 체크하기 좋습니다.
+  
+#### 필터 체인
+- HTTP 요청 -> WAS -> `필터1` -> `필터2` -> `필터3` -> 서블릿(디스패처 서블릿) -> 컨트롤러
+- 
+#### 필터 인터페이스 
+```java 
+public interface Filter {
+
+public default void init(FilterConfig filterConfig) throws ServletException
+{}
+
+public void doFilter(ServletRequest request, ServletResponse response,
+FilterChain chain) throws IOException, ServletException;
+
+public default void destroy() {}
+}
+```
+- WAS가 doFilter 호출한 후에 필터가 없으면 서블릿이 호출됩니다.
+- 필터 인스페이스를 구현하고 등록하면 서블릿 컨테이너가 필터를 싱글톤 객체로 생성하고 관리합니다.
+- init() : 필터 초기화 메서드, 서블릿 컨테이너가 생성될 때 호출됩니다.
+- doFilter() : 고객의 요청이 올 때마다 해당 메서드가 호출됩니다. 필터의 로직을 구현하면 됩니다.
+- destroy() : 필터 종료 메서드, 서블릿 컨테이너가 종료될 때 호출됩니다.
+
+### 서블릿 필터 - 요청로그
+#### 로그필터 - LogFilter
+```java 
+import lombok.extern.slf4j.Slf4j;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.UUID;
+
+@Slf4j
+public class LogFilter implements Filter {
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        log.info("log filter init");
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        log.info("log filter doFilter");
+        HttpServletRequest httpRequest = (HttpServletRequest) request; // 다운캐스팅 부모의 ServeltRequest가 기능이 별로 없다.
+        String requestURI = httpRequest.getRequestURI();
+
+        String uuid = UUID.randomUUID().toString();
+        try {
+            log.info("REQUEST [{}][{}]", uuid, requestURI);
+            chain.doFilter(request, response); // 필터 및 서블릿 호출
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            log.info("RESPONSE [{}][{}]", uuid, requestURI);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        log.info("log filter destroy");
+    }
+}
+```
+#### 필터설정 - WebConfig
+```java
+import hello.login.web.filter.LogFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.servlet.Filter;
+
+
+@Configuration
+public class WebConfig {
+
+    @Bean
+    public FilterRegistrationBean logFilter() {
+        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new LogFilter());
+        filterRegistrationBean.setOrder(1);
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
+}
+```
+#### 실행로그
+```
+REQUEST [a89553d4-0d13-4400-803c-d2387edb7445][/]
+RESPONSE [a89553d4-0d13-4400-803c-d2387edb7445][/]
+```
+
+> 참고! 실무에서 HTTP 요청시 같은 요청의 로그에 모두 같은 식별자를 자동으로 남기는 방법은 logback mdc로 검색해보면 됩니다.
+
+
 
