@@ -2468,7 +2468,7 @@ throws Exception {}
 
 default void afterCompletion(HttpServletRequest request, HttpServletResponse
 response,
-Object handler, @Nullable **Exception ex**) throws
+Object handler, @Nullable Exception ex) throws
 Exception {}
 
 }
@@ -2494,4 +2494,5 @@ Exception {}
 - postHandle : 컨트롤러에서 예외가 발생하면 postHandle 은 호출되지 않는다.
 - afterCompletion : afterCompletion 은 항상 호출된다. 이 경우 예외( ex )를 파라미터로 받아서 어떤
 예외가 발생했는지 로그로 출력할 수 있다.
-	- 예외가 발생하면 postHandle()은 호출되지 않으므로 *예외와 무관하게 공통 처리를 하려면 afterCompletion()을 사용*해야 한다. 
+	- 예외가 발생하면 postHandle()은 호출되지 않으므로 **예외와 무관하게 공통 처리를 하려면 afterCompletion()을 사용**해야 한다.
+  	- default void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, `@Nullable Exception ex`) throws Exception {}
