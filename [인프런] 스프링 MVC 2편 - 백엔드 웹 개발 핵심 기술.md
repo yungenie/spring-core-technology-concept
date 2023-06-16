@@ -2584,6 +2584,63 @@ registry.addInterceptor(new LogInterceptor())
 <img width="100%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/7dd4ceaa-25be-4f09-8362-aa2c1eb1c56a">
 
 
+### 스프링 인터셉터 - 로그인 인증 체크 
+#### 로그인 인증 체크 인터셉터 - LoginCheckInterceptor
 
+```java
+import hello.login.web.session.SessionConst;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+@Slf4j
+public class LoginCheckInterceptor implements HandlerInterceptor {
+
+    /**
+     * 로그인 인증 체크
+     */
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        String requestURI = request.getRequestURI();
+
+        log.info("인증 체크 인터셉터 실행 {}", requestURI);
+
+        HttpSession session = request.getSession();
+        if (session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
+            log.info("미인증 사용자 요청");
+            //로그인으로 redirect
+            response.sendRedirect("/login?redirectURL=" + requestURI);
+            return false;
+        }
+
+        return true;
+    }
+}
+```
+
+#### 인터셉터 등록 - WebConfig
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "/*.ico", "/error");
+
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/", "/members/add", "/login", "/logout",
+                        "/css/**", "/*.ico", "/error"); // 로그인 체크 배제
+    }
+}
+ ```
+
+> 정리 : 서블릿 필터와 스프링 인터셉터는 웹과 관련된 공통 관심사를 해결하기 위한 기술이다. 특별한 문제가 없다면 인터셉터를 사용하는 것이 좋습니다. 
