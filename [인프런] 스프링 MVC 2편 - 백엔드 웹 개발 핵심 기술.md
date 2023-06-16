@@ -2495,3 +2495,95 @@ public interface HandlerInterceptor {
 ### 스프링 인터셉터 - 요청 로그
 - 모든 요청에 대해서 로그로 출력합니다.
 
+#### 요청 로그 인터셉터 - LogInterceptor
+
+```java
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
+
+@Slf4j
+public class LogInterceptor implements HandlerInterceptor {
+
+    public static final String LOG_ID = "logId";
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        String requestURI = request.getRequestURI();
+        String uuid = UUID.randomUUID().toString();
+
+        request.setAttribute(LOG_ID, uuid);
+
+        //@RequestMapping: HandlerMethod
+        //정적 리소스: ResourceHttpRequestHandler
+	// 타입에 따라 처리가 필요함!!
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod hm = (HandlerMethod) handler;//호출할 컨트롤러 메서드의 모든 정보가 포함되어 있다.
+        }
+
+        log.info("REQUEST [{}][{}][{}]", uuid, requestURI, handler);
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        log.info("postHandle [{}]", modelAndView);
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        String requestURI = request.getRequestURI();
+        String logId = (String) request.getAttribute(LOG_ID);
+        log.info("RESPONSE [{}][{}][{}]", logId, requestURI, handler);
+        if (ex != null) {
+            log.error("afterCompletion error!!", ex);
+        }
+    }
+}
+```
+- `request.setAttribute(LOG_ID, uuid);`
+  	- 서블릿 필터의 경우 지역변수로 해결이 가능하지만, 스프링 인터셉터는 호출 시점이 완전히 분리되어 있다. preHandle, postHandle, afterCompletion에서 함께 사용하려면 어딘가에 담아둬야 한다. LogInterceptor도 싱글톤처럼 사용되기 때문에 멤버변수를 사용하려면 위험하다. 따라서 request에 담아두었다. 
+
+
+##### HandlerMethod
+- 스프링을 사용하면 일반적으로 @Controller, @RequestMapping을 활용한 핸들러 매핑을 사용하는데, 이 경우 핸들러 정보로 HandlerMethod가 넘어옵니다.
+
+##### ResourceHttpRequestHandler
+- @Controller가 아니라 /resources/static 같은 정적 리소스가 호출 되는 경우
+ResourceHttpRequestHandler가 핸들러 정보로 넘어오기때문에 타입에 따라 처리가 필요합니다.
+
+#### 인터셉터 등록 - WebConfig
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+@Override
+public void addInterceptors(InterceptorRegistry registry) {
+registry.addInterceptor(new LogInterceptor())
+.order(1)
+.addPathPatterns("/**")
+.excludePathPatterns("/css/**", "/*.ico", "/error");
+}
+//...
+}
+```
+- WebMvcConfigurer가 제공하는 addInterceptors()를 사용해서 인터셉터를 등록할 수 있다. 
+- registry.addInterceptor(new LogInterceptor()) : 인터셉터를 등록한다.
+- order(1) : 인터셉터의 호출 순서를 지정한다. 낮을 수록 먼저 호출된다.
+- addPathPatterns("/**") : 인터셉터를 적용할 URL 패턴을 지정한다.
+- excludePathPatterns("/css/**", "/*.ico", "/error") : 인터셉터에서 제외할 패턴을 지정한다.
+
+
+#### 실행 로그 
+<img width="100%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/7dd4ceaa-25be-4f09-8362-aa2c1eb1c56a">
+
+
+
+
+
