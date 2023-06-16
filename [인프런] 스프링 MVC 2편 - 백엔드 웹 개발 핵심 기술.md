@@ -2436,3 +2436,62 @@ public class WebConfig {
     }
 ```
 - 로그인 체크 필터에서, 미인증 사용자는 요청 경로를 포함해서 /login에 redirectURL 요청 파라미터를 추가 요청했다. 이 값을 사용해서 로그인 성공시 해당 경로로 고객을 redirect 한다.
+
+
+### 스프링 인터셉터
+#### 스프링 인터셉터 흐름
+`HTTP 요청 -> WAS -> 필터 -> 서블릿 -> *스프링 인터셉터* -> 컨트롤러`
+- 스프링 인터셉터는 디스패처 서블릿과 컨트롤러 사이에서 컨트롤러 호출 직전에 호출됩니다.
+
+#### 스프링 인터셉터 제한
+`
+HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 스프링 인터셉터 -> 컨트롤러 //로그인 사용자
+HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 스프링 인터셉터(적절하지 않은 요청이라 판단, 컨트롤러 호출
+X) // 비 로그인 사용자
+`
+
+#### 스프링 인터셉터 체인
+`HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 인터셉터1 -> 인터셉터2 -> 컨트롤러`
+
+#### 스프링 인터셉터 인터페이스
+```java
+public interface HandlerInterceptor {
+
+default boolean preHandle(HttpServletRequest request, HttpServletResponse
+response,
+Object handler) throws Exception {}
+
+default void postHandle(HttpServletRequest request, HttpServletResponse
+response,
+Object handler, @Nullable ModelAndView modelAndView)
+throws Exception {}
+
+default void afterCompletion(HttpServletRequest request, HttpServletResponse
+response,
+Object handler, @Nullable Exception ex) throws
+Exception {}
+
+}
+```
+- 서블릿 필터의 경우 단순하게 doFilter() 메서드에 request,response만 제공했다.
+- 인터셉터는 컨트롤러 호출 전 preHandle, 호출 후 postHandle, 요청 완료 이후 afterCompletion 와 같이 단계적으로 잘 세분화 되어 있습니다.
+- 어떤 컨트롤러 (handler)가 호출되는 지 호출 정보도 받을 수 있다. 그리고 어떤 ModelAndView가 반환되는 지 응답 정보도 받을 수 있다.
+
+#### 스프링 인터셉터 호출 흐름
+<img width="100%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d689429e-4d6e-4297-b551-d3b4b4ff5632">
+
+##### 정상흐름
+- preHandle : 컨트롤러 호출 전에 호출된다. (더 정확히는 핸들러 어댑터 호출 전에 호출된다.)
+	- preHandle 의 응답값이 true 이면 다음으로 진행하고, false 이면 더는 진행하지 않는다. false 인 경우 나머지 인터셉터는 물론이고, 핸들러 어댑터도 호출되지 않는다. 그림에서 1번에서 끝이
+나버린다.
+- postHandle : 컨트롤러 호출 후에 호출된다. (더 정확히는 핸들러 어댑터 호출 후에 호출된다.)
+- afterCompletion : 뷰가 렌더링 된 이후에 호출된다.
+
+##### 예외상황
+<img width="100%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/2621d3e2-d285-45a6-9d42-880b9a4f4b6f">
+
+- preHandle : 컨트롤러 호출 전에 호출된다.
+- postHandle : 컨트롤러에서 예외가 발생하면 postHandle 은 호출되지 않는다.
+- afterCompletion : afterCompletion 은 항상 호출된다. 이 경우 예외( ex )를 파라미터로 받아서 어떤
+예외가 발생했는지 로그로 출력할 수 있다.
+	- *예외가 발생하면 postHandle()은 호출되지 않으므로 예외와 무관하게 공통 처리를 하려면 afterCompletion()을 사용해야 한다. 
