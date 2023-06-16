@@ -2643,4 +2643,96 @@ public class WebConfig implements WebMvcConfigurer {
 }
  ```
 
-> 정리 : 서블릿 필터와 스프링 인터셉터는 웹과 관련된 공통 관심사를 해결하기 위한 기술이다. 특별한 문제가 없다면 인터셉터를 사용하는 것이 좋습니다. 
+> 정리 : 서블릿 필터와 스프링 인터셉터는 웹과 관련된 공통 관심사를 해결하기 위한 기술이다. 특별한 문제가 없다면 인터셉터를 사용하는 것이 좋습니다.
+
+
+### ArgumentResolver활용
+- 요청 매핑 헨들러 어뎁터 구조에서 ArgumentResolver 이용해서 로그인 회원을 조금 더 편리하게 찾을 수 있습니다. 
+
+#### @Login 애노테이션 생성
+
+ ```java
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Login {
+}
+ ```
+
+#### LoginMemberArgumentResolver 생성
+- 로그인 인증체크
+
+ ```java
+import hello.login.domain.member.Member;
+import hello.login.web.session.SessionConst;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.MethodParameter;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+@Slf4j
+public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
+
+    @Override
+    public boolean supportsParameter(MethodParameter parameter) {
+        log.info("supportsParameter 실행");
+
+        boolean hasLoginAnnotation = parameter.hasParameterAnnotation(Login.class);
+        boolean hasMemberType = Member.class.isAssignableFrom(parameter.getParameterType());
+
+        return hasLoginAnnotation && hasMemberType;
+    }
+
+    @Override
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+
+        log.info("resolveArgument 실행");
+
+        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return null;
+        }
+
+        return session.getAttribute(SessionConst.LOGIN_MEMBER);
+    }
+}
+ ```
+
+##### HomeController - 추가
+ ```java
+    /**
+     * 요청 매핑 핸들러 어댑터 구조 ArgumentResolver 사용
+     *
+     */
+    @GetMapping("/")
+    public String homeLogin(@Login Member loginMember, Model model) {
+
+        //세션에 회원 데이터가 없으면 home
+        if (loginMember == null) {
+            return "home";
+        }
+
+        //세션이 유지되면 로그인으로 이동
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+```
+
+##### WebConfig - 설정추가
+	
+ ```java
+        @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new LoginMemberArgumentResolver());
+    }
+     ```
