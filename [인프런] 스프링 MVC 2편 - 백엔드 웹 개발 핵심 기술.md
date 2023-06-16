@@ -2468,7 +2468,7 @@ throws Exception {}
 
 default void afterCompletion(HttpServletRequest request, HttpServletResponse
 response,
-Object handler, @Nullable Exception ex) throws
+Object handler, @Nullable **Exception ex**) throws
 Exception {}
 
 }
