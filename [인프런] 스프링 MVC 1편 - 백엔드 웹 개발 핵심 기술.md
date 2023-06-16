@@ -941,7 +941,7 @@ public interface HttpMessageConverter<T> {
 - HttpServletRequest, Model, @RequestParam , @ModelAttribute, @RequestBody, HttpEntity 같은 HTTP 메시지를 처리하는 부분까지 파라미터를 유연하게 처리할 수 있는 이유가 바로 ArgumentResolver 덕분이다.
 - ```동작원리``` : 애노테이션 기반 컨트롤러를 처리하는 RequestMappingHandlerAdapter가 ArgumentResolver 호출해서 컨트롤러(핸들러)가 필요로 하는 **다양한 파라미터의 값(객체)를 생성**합니다. 그 후 컨트롤러를 호출하면서 값을 넘겨줍니다.  
 
-#### ArgumentResolver -> HTTP 메시지 컨버터(오청)
+#### ArgumentResolver -> HTTP 메시지 컨버터(요청)
 - @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있습니다.
 - 이 ArgumentResolver들이 HTTP 메시지 컨버터를 사용해서 ```필요한 객체를 생성```하는 것이다.
 
