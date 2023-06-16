@@ -2439,6 +2439,9 @@ public class WebConfig {
 
 
 ### 스프링 인터셉터
+- 스프링 인터셉터도 서블릿 필터와 같이 웹 관련된 공통 관심 사항을 효과적으로 해결할 수 있는 기술 입니다. 스프링 인터셉터는 스프링 MVC가 제공하는 기술 입니다.
+- 스프링 인터셉터가 서블릿 필터보다 더 많은 기능과 범위를 제공합니다.
+
 #### 스프링 인터셉터 흐름
 `HTTP 요청 -> WAS -> 필터 -> 서블릿 -> *스프링 인터셉터* -> 컨트롤러`
 - 스프링 인터셉터는 디스패처 서블릿과 컨트롤러 사이에서 컨트롤러 호출 직전에 호출됩니다.
@@ -2488,3 +2491,7 @@ public interface HandlerInterceptor {
 예외가 발생했는지 로그로 출력할 수 있다.
 	- 예외가 발생하면 postHandle()은 호출되지 않으므로 **예외와 무관하게 공통 처리를 하려면 afterCompletion()을 사용**해야 한다.
   	- default void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, `@Nullable Exception ex`) throws Exception {}
+
+### 스프링 인터셉터 - 요청 로그
+- 모든 요청에 대해서 로그로 출력합니다.
+
