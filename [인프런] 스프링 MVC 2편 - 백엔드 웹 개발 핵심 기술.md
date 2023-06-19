@@ -13,7 +13,7 @@
 - [로그인 처리1 - 쿠키,세션](#로그인-처리1---쿠키세션)
 - [로그인 처리1 - 쿠키,세션 정리](#로그인-처리1---쿠키세션-정리)
 - [로그인 처리2 - 필터, 인터셉터](#로그인-처리2---필터-인터셉터)
-
+- [예외 처리와 오류 페이지](#예외-처리와-오류-페이지)
 <br>
 
 ## 타임리프 기본 기능
@@ -2735,4 +2735,22 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new LoginMemberArgumentResolver());
     }
-     ```
+```
+
+<br>
+
+## 예외 처리와 오류 페이지
+### 서블릿 예외 처리 
+#### 예외 발생 흐름
+- WAS(여기까지 전파) <- 필터 <- 서블릿 <- 인터셉터 <- 컨트롤러(예외발생)
+
+#### sendError 흐름
+WAS(sendError 호출 기록 확인) <- 필터 <- 서블릿 <- 인터셉터 <- 컨트롤러(response.sendError())
+
+#### 예외 발생과 오류 페이지 요청 흐름
+1. WAS(여기까지 전파) <- 필터 <- 서블릿 <- 인터셉터 <- 컨트롤러(예외발생)
+2. WAS `/error-page/500` 다시 요청 -> 필터 -> 서블릿 -> 인터셉터 -> 컨트롤러(/error-page/500) -> View
+
+### 서블릿 예외 처리 - 필터
+- 클라이언트로 부터 발생한 정상 요청인지, 아니면 오류 페이지를 출력하기 위한 내부 요청인지 구분할
+수 있어야 한다. 서블릿은 이런 문제를 해결하기 위해 DispatcherType 이라는 추가 정보를 제공한다.
