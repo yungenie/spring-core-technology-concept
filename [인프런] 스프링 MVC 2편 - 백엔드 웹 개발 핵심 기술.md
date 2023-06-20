@@ -2755,3 +2755,16 @@ WAS(sendError 호출 기록 확인) <- 필터 <- 서블릿 <- 인터셉터 <- �
 - 클라이언트로 부터 발생한 정상 요청인지, 아니면 오류 페이지를 출력하기 위한 내부 요청인지 구분할
 수 있어야 한다. 서블릿은 이런 문제를 해결하기 위해 DispatcherType 이라는 추가 정보를 제공한다.
 - DispatcherType REQUEST : 클라이언트 요청, ERROR : 오류 요청
+
+### 스프링 부트 오류 페이지 
+- 스프링 부트는 ErrorPage를 자동으로 등록해줍니다.
+- 이때 /error라는 경로로 기본 오류 페이지를 설정해줍니다.
+	- new ErrorPage("/error"), 상태코드와 예외를 설정하지 않으면 기본 오류 페이지로 사용됩니다.
+   	- 서블릿 밖으로 예외가 발생하거나, response.sendError(...)가 호출되면 모든 오류는 /error를 호출합니다.
+- BasicErrorController라는 스프링 컨트롤러를 자동으로 등록합니다.
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/d557b759-f17a-41e8-8f4f-97c0d4e30588">
+
+> 스프링 부트가 제공하는 기본 오류 로직이 BasicErrorController에 제공됩니다. 개발자는 오류 페이지 화면만 BasicErrorController가 제공하는 룰과 우선수위에 따라서 등록해줍니다.
+> 1. 뷰 템플릿, 2. 정적 리소스(static, public), 3. 적용 대상이 없을 대 뷰 이름
+
+
