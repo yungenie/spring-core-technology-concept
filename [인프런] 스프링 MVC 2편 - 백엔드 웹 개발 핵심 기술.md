@@ -2782,8 +2782,10 @@ WAS(sendError 호출 기록 확인) <- 필터 <- 서블릿 <- 인터셉터 <- �
 - 스프링이 제공하는 ExceptionResolver
 - 스프링이 제공하는 ExceptionResolver는 다음과 같다.
 - HandlerExceptionResolverComposite에 아래와 같은 순서로 등록합니다.
-	1. ExceptionHandlerExceptionResolver (@ExceptionHandler, API 예외 처리는 대부분 이 기능으로 해결)
-	2. ResponseStatusExceptionResolver (@ResponseStatus(value = HttpStatus.NOT_FOUND), HTTP 상태 코드를 지정해줌)
- 	3. DefaultHandlerExceptionResolver (우선 순위가 가장 낮다)
-
+  1. **ExceptionHandlerExceptionResolver**
+		- @ExceptionHandler, API 예외 처리는 대부분 이 기능으로 해결
+  2. **ResponseStatusExceptionResolver**
+		- @ResponseStatus(value = HttpStatus.NOT_FOUND), HTTP 상태 코드를 지정해줌
+  3. **DefaultHandlerExceptionResolver**
+		- 우선 순위가 가장 낮다
 
