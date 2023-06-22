@@ -14,6 +14,7 @@
 - [로그인 처리1 - 쿠키,세션 정리](#로그인-처리1---쿠키세션-정리)
 - [로그인 처리2 - 필터, 인터셉터](#로그인-처리2---필터-인터셉터)
 - [예외 처리와 오류 페이지](#예외-처리와-오류-페이지)
+- [API 예외 처리](#API-예외-처리)
 <br>
 
 ## 타임리프 기본 기능
@@ -2773,3 +2774,16 @@ WAS(sendError 호출 기록 확인) <- 필터 <- 서블릿 <- 인터셉터 <- �
 ### 예외 처리와 오류 페이지 정리
 - 스프링 부트를 사용하면 사용자에게 제공하는 간단한 오류 페이지(html)만 추가하여 처리 할 수 있습니다.
 - 그 이유는 스프링 부트에서 기본적으로 BasicErrorController에 기능이 제공되어 있기 때문입니다.
+
+
+<br>
+
+## API 예외 처리
+- 스프링이 제공하는 ExceptionResolver
+- 스프링이 제공하는 ExceptionResolver는 다음과 같다.
+- HandlerExceptionResolverComposite에 아래와 같은 순서로 등록합니다.
+	1. ExceptionHandlerExceptionResolver (@ExceptionHandler, API 예외 처리는 대부분 이 기능으로 해결)
+	2. ResponseStatusExceptionResolver (@ResponseStatus(value = HttpStatus.NOT_FOUND), HTTP 상태 코드를 지정해줌)
+ 	3. DefaultHandlerExceptionResolver (우선 순위가 가장 낮다)
+
+
