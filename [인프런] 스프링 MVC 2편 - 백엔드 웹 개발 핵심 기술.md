@@ -2772,7 +2772,8 @@ WAS(sendError 호출 기록 확인) <- 필터 <- 서블릿 <- 인터셉터 <- �
 > 실무에서는 고객이 이해할 수 있는 간단한 오류 메시지나 페이지만 보여주고 오류는 서버에 로그를 남겨서 로그로 확인 하도록 합니다.
 
 ### 예외 처리와 오류 페이지 정리
-- 스프링 부트를 사용하면 사용자에게 제공하는 간단한 오류 페이지(html)만 추가하여 처리 할 수 있습니다.
+- 스프링 부트를 사용하면 사용자에게 제공하는 `간단한 오류 페이지(html)만 추가`하여 처리 할 수 있습니다.
+  	- 4xx.html, 404.html, 500.html 추가해주면 됩니다. 
 - 그 이유는 스프링 부트에서 기본적으로 BasicErrorController에 기능이 제공되어 있기 때문입니다.
 
 
@@ -2789,3 +2790,144 @@ WAS(sendError 호출 기록 확인) <- 필터 <- 서블릿 <- 인터셉터 <- �
   3. **DefaultHandlerExceptionResolver**
 		- 우선 순위가 가장 낮다
 
+### API 예외 처리 - @ExceptionHandler
+- 단순히 오류 화면을 보여주는 것이 아니라, 스펙에 따라 다르다.
+- 동일한 Exception임에도 Controller마다 다르게 보여줘야 한다면?
+
+#### ErrorResult
+- 예외가 발생했을 때 API 응답으로 사용하는 객체를 정의
+```java
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+
+
+@Getter
+@AllArgsConstructor
+@ToString
+public class ErrorResult {
+    private String code;
+    private String message;
+}
+```
+
+#### ApiExceptionV2Controller
+- @ExceptionHandler 애노테이션을 선언하고, 해당 컨트롤러에서 처리하고 싶은 예외를 지정해주면 된다.
+```java
+import hello.exception.exception.UserException;
+import hello.exception.exhandler.ErrorResult;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 스프링 @ExcpetionHandler // 해당 컨트롤러에서 처리하고 싶은 예외를 지정할 수 있다. (다른 컨트롤러 영향 안줌)
+ */
+@Slf4j
+@RestController
+public class ApiExceptionV2Controller {
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler
+    public ErrorResult exHandle(Exception e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult("EX", "내부 오류");
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResult> userExHandle(UserException e) {
+        log.error("[exceptionHandle] ex", e);
+        ErrorResult errorResult = new ErrorResult("USER-EX", e.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult illegalExHandle(IllegalArgumentException e) {
+        log.error("[exceptionHandle] ex", e);
+        return new ErrorResult("BAD", e.getMessage());
+    }
+
+    @GetMapping("/api2/members/{id}")
+    public MemberDto getMember(@PathVariable("id") String id) {
+
+        if (id.equals("ex")) {
+            //throw new RuntimeException("잘못된 사용자");
+            throw new RuntimeException();
+        }
+        if (id.equals("bad")) {
+            throw new IllegalArgumentException("잘못된 입력 값");
+        }
+        if (id.equals("user-ex")) {
+            throw new UserException("사용자 오류");
+        }
+
+        return new MemberDto(id, "hello " + id);
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @ToString
+    static class MemberDto {
+        private String memberId;
+        private String name;
+    }
+}
+```
+
+> 컨트롤러마다 다르게 예외를 보여주고 싶을 때 적용, 그러나 공통적으로 다른 컨트롤러도 동일하게 예외처리를 하고 싶을 때 다음에 나올 @ControllerAdvice를 사용하면 됩니다. 
+
+
+### API 예외 처리 - @ControllerAdvice
+```java
+import hello.exception.exception.UserException;
+import hello.exception.exhandler.ErrorResult;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice(basePackages = "hello.exception.api")
+public class ExControllerAdvice {
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult illegalExHandler(IllegalArgumentException e) {
+        log.error("[exceptionHandler] ex", e);
+        return new ErrorResult("BAD", e.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResult> userExHandler(UserException e) {
+        log.error("[exceptionHandler] ex", e);
+        ErrorResult errorResult = new ErrorResult("USER-EX", e.getMessage());
+        return new ResponseEntity(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler
+    public ErrorResult exHandler(Exception e) {
+        log.error("[exceptionHandler] ex", e);
+        return new ErrorResult("EX", "내부 오류");
+    }
+
+}
+```
+- **@RestControllerAdvice 는 @ControllerAdvice 와 같고, @ResponseBody 가 추가되어 있다. @Controller , @RestController 의 차이와 같다.**
+- @RestControllerAdvice
+	- 대상을 지정하지 않으면 모든 컨트롤러에 적용된다. (글로벌 적용)
+- @RestControllerAdvice(annotations = RestController.class)
+  	- 특정 어노테이션 대상만 적용할 수 있다.
+- @ControllerAdvice(assignableTypes = {ControllerInterface.class,AbstractController.class})
+  	- 특정 클래스 대상만 적용할 수 있다.
+- @ControllerAdvice("org.example.controllers")
+  	- 특정 패키지 대상만 적용할 수 있다.
+ 
+  > @ControllerAdvice와 @ExceptionHandler 조합하면 예외를 상황에 맞게 깔끔하게 해결할 수 있습니다.
