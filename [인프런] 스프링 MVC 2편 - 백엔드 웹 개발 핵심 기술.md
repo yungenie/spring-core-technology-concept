@@ -2937,6 +2937,7 @@ public class ExControllerAdvice {
 #### API 예외처리 정리
 - HTML페이지 경우
 	- 4XX.404,500.HTML만 추가로 만들어 주면 된다.
-
 - API 경우
 	- 스프링 부트 기본 처리 BasicErrorController, HandlerExceptionResolver(컨트롤러에서 예외를 Dispatcher Servelt가 ExceptionResolver에게 기회를 한번 줘서 처리한다), ExceptionResolver, @ExceptionHandler(컨트롤러 내부 단독), @ControllerAdvice(공용으로 대상자 지정 가능)
+
+
