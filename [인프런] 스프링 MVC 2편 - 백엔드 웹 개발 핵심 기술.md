@@ -2935,6 +2935,8 @@ public class ExControllerAdvice {
 
 
 #### API 예외처리 정리
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/dbe186d9-67ed-45e1-a5c5-ed2ebc1e549a">
+
 - HTML페이지 경우
 	- 4XX.404,500.HTML만 추가로 만들어 주면 된다.
 - API 경우
