@@ -2929,5 +2929,6 @@ public class ExControllerAdvice {
   	- 특정 클래스 대상만 적용할 수 있다.
 - @ControllerAdvice("org.example.controllers")
   	- 특정 패키지 대상만 적용할 수 있다.
+
  
-  > @ControllerAdvice와 @ExceptionHandler 조합하면 예외를 상황에 맞게 깔끔하게 해결할 수 있습니다.
+> 정리 @ControllerAdvice와 @ExceptionHandler 조합하면 예외를 상황에 맞게 깔끔하게 해결할 수 있습니다.
