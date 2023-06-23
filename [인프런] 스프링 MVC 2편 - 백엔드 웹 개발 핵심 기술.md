@@ -2931,4 +2931,4 @@ public class ExControllerAdvice {
   	- 특정 패키지 대상만 적용할 수 있다.
 
  
-> 정리 @ControllerAdvice와 @ExceptionHandler 조합하면 예외를 상황에 맞게 깔끔하게 해결할 수 있습니다.
+> 정리, 실무에서 예외를 공통으로 처리하는 게 굉장히 중요하기 때문에 @ControllerAdvice와 @ExceptionHandler 조합하면 예외를 적절한 상황에 맞게 깔끔하게 해결할 수 있습니다.
