@@ -15,6 +15,7 @@
 - [로그인 처리2 - 필터, 인터셉터](#로그인-처리2---필터-인터셉터)
 - [예외 처리와 오류 페이지](#예외-처리와-오류-페이지)
 - [API 예외 처리](#API-예외-처리)
+- [스프링 타입 컨버터](#스프링-타입-컨버터)
 <br>
 
 ## 타임리프 기본 기능
@@ -2942,4 +2943,4 @@ public class ExControllerAdvice {
 - API 경우
 	- 스프링 부트 기본 처리 BasicErrorController, HandlerExceptionResolver(컨트롤러에서 예외를 Dispatcher Servelt가 ExceptionResolver에게 기회를 한번 줘서 처리한다), ExceptionResolver, @ExceptionHandler(컨트롤러 내부 단독), @ControllerAdvice(공용으로 대상자 지정 가능)
 
-
+## 스프링 타입 컨버터
