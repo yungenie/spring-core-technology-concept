@@ -3034,4 +3034,5 @@ public class MyNumberFormatter implements Formatter<Number> {
 	}
 }
 ```
-
+- parse() : "1,000" -> 1000
+- print()  : 1000 -> "1,000"
