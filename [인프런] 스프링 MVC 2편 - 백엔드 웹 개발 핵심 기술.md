@@ -2944,3 +2944,22 @@ public class ExControllerAdvice {
 	- 스프링 부트 기본 처리 BasicErrorController, HandlerExceptionResolver(컨트롤러에서 예외를 Dispatcher Servelt가 ExceptionResolver에게 기회를 한번 줘서 처리한다), ExceptionResolver, @ExceptionHandler(컨트롤러 내부 단독), @ControllerAdvice(공용으로 대상자 지정 가능)
 
 ## 스프링 타입 컨버터
+### 타입 컨버터 - Converter
+```java
+package org.springframework.core.convert.converter;
+
+public interface Converter<S, T> {
+	T convert(S source);
+}
+```
+- 타입 컨버터를 하나하나 직접 구현해서 사용했다.
+- 기본 타입의 컨버터 인터페이스 구현해서 타입 변환을 처리 했다.
+
+### 컨버전 서비스 - ConversionService
+- 컨버터 묶음
+
+단순히 컨버팅이 가능한가? 확인하는 기능과, 컨버팅 기능을 제공한다.
+
+인터페이스 분리의 원칙(ISP : Interface Segregation Principle)
+- 클라이언트가 자신이 이용하지 않는 메서드에 의존하지 않아야 한다.
+- 클라이언트의 용도에 따라 인터페이스를 쪼개야 한다. 
