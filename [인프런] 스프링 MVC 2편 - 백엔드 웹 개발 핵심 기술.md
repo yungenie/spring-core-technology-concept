@@ -2957,13 +2957,81 @@ public interface Converter<S, T> {
 
 ### 컨버전 서비스 - ConversionService
 - 컨버터 묶음
-
-단순히 컨버팅이 가능한가? 확인하는 기능과, 컨버팅 기능을 제공한다.
-
-인터페이스 분리의 원칙(ISP : Interface Segregation Principle)
-- 클라이언트가 자신이 이용하지 않는 메서드에 의존하지 않아야 한다.
-- 클라이언트의 용도에 따라 인터페이스를 쪼개야 한다. 
-
 - 스프링 내부에서 ConversionService를 사용해서 타입을 변환합니다.
 - ex) @RequestParam 같은 곳에서 ConversionService 사용해서 타입을 변환함. 
+
+```java
+import hello.typeconverter.converter.IntegerToStringConverter;
+import hello.typeconverter.converter.IpPortToStringConverter;
+import hello.typeconverter.converter.StringToIntegerConverter;
+import hello.typeconverter.converter.StringToIpPortConverter;
+import hello.typeconverter.formatter.MyNumberFormatter;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        //주석처리 우선순위
+        registry.addConverter(new StringToIntegerConverter());
+        registry.addConverter(new IntegerToStringConverter());
+        registry.addConverter(new StringToIpPortConverter());
+        registry.addConverter(new IpPortToStringConverter());
+
+        //추가
+        registry.addFormatter(new MyNumberFormatter());
+    }
+}
+```
+
+```java
+    @GetMapping("/ip-port")
+    public String ipPort(@RequestParam IpPort ipPort) {
+        System.out.println("ipPort IP = " + ipPort.getIp());
+        System.out.println("ipPort PORT = " + ipPort.getPort());
+        return "ok";
+    }
+```
+#### 처리 과정
+- @RequestParam 은 @RequestParam 을 처리하는 ArgumentResolver 인 RequestParamMethodArgumentResolver 에서 ConversionService 를 사용해서 타입을 변환한다.
+
+
+### 뷰 템플릿에 컨버터 적용하기 
+- 컨버전 서비스 적용 : ${{ }}
+- 변수 표현식 : ${ }
+
+### 포맷터 Formatter
+- Converter는 범용(객체 -> 객체)
+- Formatter는 문자에 특화 (객체 -> 문자, 문자 -> 객체) + 현지화(Locale) // Converter의 특별한 버전 
+
+```java
+package hello.typeconverter.formatter;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.Formatter;
+
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
+
+@Slf4j
+public class MyNumberFormatter implements Formatter<Number> {
+
+@Override
+public Number parse(String text, Locale locale) throws ParseException {
+log.info("text={}, locale={}", text, locale);
+NumberFormat format = NumberFormat.getInstance(locale);
+return format.parse(text);
+}
+
+@Override
+public String print(Number object, Locale locale) {
+log.info("object={}, locale={}", object, locale);
+return NumberFormat.getInstance(locale).format(object);
+}
+}
+```
 
