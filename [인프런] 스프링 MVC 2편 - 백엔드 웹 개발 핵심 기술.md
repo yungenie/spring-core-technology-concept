@@ -2963,3 +2963,7 @@ public interface Converter<S, T> {
 인터페이스 분리의 원칙(ISP : Interface Segregation Principle)
 - 클라이언트가 자신이 이용하지 않는 메서드에 의존하지 않아야 한다.
 - 클라이언트의 용도에 따라 인터페이스를 쪼개야 한다. 
+
+- 스프링 내부에서 ConversionService를 사용해서 타입을 변환합니다.
+- ex) @RequestParam 같은 곳에서 ConversionService 사용해서 타입을 변환함. 
+
