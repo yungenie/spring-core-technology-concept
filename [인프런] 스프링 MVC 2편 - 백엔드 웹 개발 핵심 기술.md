@@ -2973,10 +2973,10 @@ public String helloV1(HttpServletRequest request) {
 ```
 - http://localhost:8080/hello-v2?data=10
 - HTTP 쿼리 스트링은 문자타입이지만, 스프링이 제공하는 @RequestParam 애노테이션이 중간에 타입을 변환을 해줍니다.
-- @ModelAttribute, @PathVariable 마찬가지로 객체와 URL 경로의 문자를 Integer타입으로 반을 
+- @ModelAttribute, @PathVariable 마찬가지로 객체와 URL 경로의 문자를 Integer타입으로 받을 수 있게 스프링이 타입변환을 해줍니다. 
 
-
-
+#### 컨버터 인터페이스 (추가적인 타입변환)
+- 새로운 타입을 만들어서 변환하고 싶은 경우 스프링이 제공하는 확장 가능한 컨버터 인터페이스를 구현해서 등록하면 됩니다. 
 
 ```java
 package org.springframework.core.convert.converter;
@@ -2985,11 +2985,56 @@ public interface Converter<S, T> {
 	T convert(S source);
 }
 ```
-- 타입 컨버터를 하나하나 직접 구현해서 사용했다.
-- 기본 타입의 컨버터 인터페이스 구현해서 타입 변환을 처리 했다.
+- 문자를 숫자로 변환하는 타입컨버터 
+```java
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.converter.Converter;
+
+@Slf4j
+public class StringToIntegerConverter implements Converter<String, Integer> {
+
+    @Override
+    public Integer convert(String source) {
+        log.info("convert source={}", source);
+        return Integer.valueOf(source);
+    }
+}
+```
+- 사용자 정의 타입 컨버터 
+```java
+import hello.typeconverter.type.IpPort;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.converter.Converter;
+
+@Slf4j
+public class StringToIpPortConverter implements Converter<String, IpPort> {
+
+    @Override
+    public IpPort convert(String source) {
+        log.info("convert source={}", source);
+        //"127.0.0.1:8080" -> IpPort 객체
+        String[] split = source.split(":");
+        String ip = split[0];
+        int port = Integer.parseInt(split[1]);
+        return new IpPort(ip, port);
+    }
+}
+```
+- 컨버터 인터페이스 구현해서 용도에 맞게 하나하나 직접 타입 변환을 처리가 가능합니다. 
+- 그런데 이렇게 타입 컨버터를 하나하나 직접 사용하면, 개발자가 직접 컨버팅 하는 것과 큰 차이가 없다.
+- 타입 컨버터를 등록하고 관리하면서 편리하게 변환 기능을 제공하는 역할을 하는 무언가가 필요하다.
+
+#### 참고
+- 스프링은 용도에 따라 다양한 방식의 타입 컨버터를 제공한다.
+- Converter 기본 타입 컨버터
+- ConverterFactory 전체 클래스 계층 구조가 필요할 때
+- GenericConverter 정교한 구현, 대상 필드의 애노테이션 정보 사용 가능
+- ConditionalGenericConverter 특정 조건이 참인 경우에만 실행
+
+> https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert
 
 ### 컨버전 서비스 - ConversionService
-- 컨버터 묶음
+- 스프링은 개별 컨버터를 모아두고 묶어서 편리하게 사용할 수 있는 기능인 컨버전 서비스를 제공합니다.
 - 스프링 내부에서 ConversionService를 사용해서 타입을 변환합니다.
 - ex) @RequestParam 같은 곳에서 ConversionService 사용해서 타입을 변환함. 
 
@@ -3026,17 +3071,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 ```
 #### 처리 과정
-- @RequestParam 은 @RequestParam 을 처리하는 ArgumentResolver 인 RequestParamMethodArgumentResolver 에서 ConversionService 를 사용해서 타입을 변환한다.
-
-
-#### 참고
-- 스프링은 용도에 따라 다양한 방식의 타입 컨버터를 제공한다.
-- Converter 기본 타입 컨버터
-- ConverterFactory 전체 클래스 계층 구조가 필요할 때
-- GenericConverter 정교한 구현, 대상 필드의 애노테이션 정보 사용 가능
-- ConditionalGenericConverter 특정 조건이 참인 경우에만 실행
-
-> https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert
+- @RequestParam 을 처리하는 ArgumentResolver 인 RequestParamMethodArgumentResolver 에서 ConversionService 를 사용해서 타입을 변환한다
 
 ### 뷰 템플릿에 컨버터 적용하기 
 - 컨버전 서비스 적용 : ${{ }}
@@ -3158,4 +3193,4 @@ public class FormatterController {
 - @NumberFormat : 숫자 관련 형식 지정 포맷터 사용
 - @DateTimeFormat : 날짜 관련 형식 지정 포맷터 사용
 
-
+> 정리 : 직접 용도에 맞게 Converter 인터페이스를 구현하여 타입 컨버터를 만들고,  ConversionService에 등록해서 범용 타입 변환으로 적용할 수 있으며, 객체를 특정 포맷으로 변환하기 위해 스프링이 기본으로 제공하는  Fomatter 애노테이션을 통해 Date, Number 포맷을 특화된 기능으로 사용할 수 있습니다.
