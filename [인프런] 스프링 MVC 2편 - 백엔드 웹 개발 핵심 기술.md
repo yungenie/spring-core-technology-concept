@@ -2943,8 +2943,41 @@ public class ExControllerAdvice {
 - API 경우
 	- 스프링 부트 기본 처리 BasicErrorController, HandlerExceptionResolver(컨트롤러에서 예외를 Dispatcher Servelt가 ExceptionResolver에게 기회를 한번 줘서 처리한다), ExceptionResolver, @ExceptionHandler(컨트롤러 내부 단독), @ControllerAdvice(공용으로 대상자 지정 가능)
 
+<br>
+
 ## 스프링 타입 컨버터
+- 애플리케이션 개발을 하다보면 타입을 변환해야하는 경우에 타입 변환 기능을 제공해주는 타입 컨버터(Converter), 컨버전 서비스(ConversionService), 스프링이 제공하는 기본 포맷터 (Formatter, @DateTimeFormat, @NumberFormat)에 대해서 알아보자. 
+
 ### 타입 컨버터 - Converter
+#### 컨버터 직접 처리
+
+```java
+@GetMapping("/hello-v1")
+public String helloV1(HttpServletRequest request) {
+	String data = request.getParameter("data"); //문자 타입 조회
+	Integer intValue = Integer.valueOf(data); //숫자 타입으로 변경
+	System.out.println("intValue = " + intValue);
+	return "ok";
+}
+```
+- http://localhost:8080/hello-v1?data=10
+- HTTP 요청 파라미터는 모두 문자로 처리된다. 따라서 요청 파라미터를 알맞은 용도로 타입변환 하는 과정을 거칩니다.
+
+#### 스프링 MVC가 제공하는 @RequestParam
+```java
+    @GetMapping("/hello-v2")
+    public String helloV2(@RequestParam Integer data) {
+        System.out.println("data = " + data);
+        return "ok";
+    }
+```
+- http://localhost:8080/hello-v2?data=10
+- HTTP 쿼리 스트링은 문자타입이지만, 스프링이 제공하는 @RequestParam 애노테이션이 중간에 타입을 변환을 해줍니다.
+- @ModelAttribute, @PathVariable 마찬가지로 객체와 URL 경로의 문자를 Integer타입으로 반을 
+
+
+
+
 ```java
 package org.springframework.core.convert.converter;
 
