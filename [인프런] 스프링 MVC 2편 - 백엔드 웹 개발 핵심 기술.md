@@ -2975,14 +2975,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        //주석처리 우선순위
+
         registry.addConverter(new StringToIntegerConverter());
         registry.addConverter(new IntegerToStringConverter());
         registry.addConverter(new StringToIpPortConverter());
         registry.addConverter(new IpPortToStringConverter());
-
-        //추가
-        registry.addFormatter(new MyNumberFormatter());
     }
 }
 ```
@@ -2998,6 +2995,16 @@ public class WebConfig implements WebMvcConfigurer {
 #### 처리 과정
 - @RequestParam 은 @RequestParam 을 처리하는 ArgumentResolver 인 RequestParamMethodArgumentResolver 에서 ConversionService 를 사용해서 타입을 변환한다.
 
+
+#### 참고
+- 스프링은 용도에 따라 다양한 방식의 타입 컨버터를 제공한다.
+- Converter 기본 타입 컨버터
+- ConverterFactory 전체 클래스 계층 구조가 필요할 때
+- GenericConverter 정교한 구현, 대상 필드의 애노테이션 정보 사용 가능
+- ConditionalGenericConverter 특정 조건이 참인 경우에만 실행
+
+> https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-
+convert
 
 ### 뷰 템플릿에 컨버터 적용하기 
 - 컨버전 서비스 적용 : ${{ }}
@@ -3036,3 +3043,86 @@ public class MyNumberFormatter implements Formatter<Number> {
 ```
 - parse() : "1,000" -> 1000
 - print()  : 1000 -> "1,000"
+
+### 포맷터를 지원하는 컨버전 서비스
+```java
+import hello.typeconverter.converter.IntegerToStringConverter;
+import hello.typeconverter.converter.IpPortToStringConverter;
+import hello.typeconverter.converter.StringToIntegerConverter;
+import hello.typeconverter.converter.StringToIpPortConverter;
+import hello.typeconverter.formatter.MyNumberFormatter;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        //주석처리 우선순위
+        registry.addConverter(new StringToIntegerConverter());
+        registry.addConverter(new IntegerToStringConverter());
+        registry.addConverter(new StringToIpPortConverter());
+        registry.addConverter(new IpPortToStringConverter());
+
+        //추가
+        registry.addFormatter(new MyNumberFormatter());
+    }
+}
+```
+
+> 컨버전 서비스는 @RequestParam , @ModelAttribute , @PathVariable , 뷰 템플릿 등에서 사용할 수
+있다. (HttpMessageConverter로 객체 <-> JSON으로 변환할 때 Jackson 같은 라이브러리 사용해야함.)
+
+### 스프링이 제공하는 기본 포맷터
+- 컨버전 서비스로 포맷터를 등록해서 사용하면, 각 객체의 필드마다 다른 형식으로 포맷을 지정하기 어렵다. 
+- 스프링은 이런 문제를 해결하기 위해 애노테이션 기반으로 원하는 형식을 지정해서 사용할 수 있는 포맷터를 제공합니다.
+
+```java
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.NumberFormat;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import java.time.LocalDateTime;
+
+@Controller
+public class FormatterController {
+
+    @GetMapping("/formatter/edit")
+    public String formatterForm(Model model) {
+        Form form = new Form();
+        form.setNumber(1000000000);
+        // 현재날짜 -> 날짜 (포맷지원)
+        form.setLocalDateTime(LocalDateTime.now());
+
+
+        model.addAttribute("form", form);
+        return "formatter-form";
+    }
+
+    @PostMapping("/formatter/edit")
+    public String formatterEdit(@ModelAttribute Form form) {
+        return "formatter-view";
+    }
+
+    @Data
+    static class Form {
+        @NumberFormat(pattern = "###,###")
+        private Integer number; // 10000 -> 10,000
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime localDateTime;
+
+    }
+}
+```
+- 스프링이 제공하는 기본 포맷터를 사용해서 원하는 형식을 지정해서 사용할 수 있습니다.
+- @NumberFormat : 숫자 관련 형식 지정 포맷터 사용
+- @DateTimeFormat : 날짜 관련 형식 지정 포맷터 사용
+
+
