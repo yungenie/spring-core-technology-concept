@@ -3121,6 +3121,7 @@ public class FormatterController {
 }
 ```
 - 스프링이 제공하는 기본 포맷터를 사용해서 원하는 형식을 지정해서 사용할 수 있습니다.
+- org.springframework.format.annotaion에서 제공해주는 포맷
 - @NumberFormat : 숫자 관련 형식 지정 포맷터 사용
 - @DateTimeFormat : 날짜 관련 형식 지정 포맷터 사용
 
