@@ -3003,8 +3003,7 @@ public class WebConfig implements WebMvcConfigurer {
 - GenericConverter 정교한 구현, 대상 필드의 애노테이션 정보 사용 가능
 - ConditionalGenericConverter 특정 조건이 참인 경우에만 실행
 
-> https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-
-convert
+> https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#core-convert
 
 ### 뷰 템플릿에 컨버터 적용하기 
 - 컨버전 서비스 적용 : ${{ }}
