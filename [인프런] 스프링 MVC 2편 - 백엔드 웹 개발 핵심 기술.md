@@ -3194,3 +3194,28 @@ public class FormatterController {
 - @DateTimeFormat : 날짜 관련 형식 지정 포맷터 사용
 
 > 정리 : 직접 용도에 맞게 Converter 인터페이스를 구현하여 타입 컨버터를 만들고,  ConversionService에 등록해서 범용 타입 변환으로 적용할 수 있으며, 객체의 필드를 특정 포맷으로 변환하기 위해 스프링이 기본으로 제공하는 Fomatter 애노테이션을 통해 Date, Number 포맷을 적용하여 특화된 기능으로 사용할 수 있습니다.
+
+
+## 파일업로드
+
+### 파일 업로드 소개
+- 일반적으로 사용하는 HTML Form을 통한 파일 업로드를 이해하려면 먼저 폼을 전송하는 다음 두 가지 방식의 차이를 이해해야 한다.
+1. HTML 폼 전송 방식
+	- application/x-www-form-urlencoded
+	- HTML 폼 데이터를 서버로 전송하는 가장 기본적인 방법이다.
+
+2. multipart/form-data
+	- 파일은 문자가 아니라 바이너리 데이터를 전송한다. 
+	- 문자와 바이너리를 동시에 전송
+
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/521229b2-63f1-48bf-85e6-44d4bf98cac5">
+
+### 서블릿과 파일 업로드 
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/ea2a10da-b861-469b-bb57-3c6059b1c12c">
+<img width="70%" alt="image" src="https://github.com/yungenie/study-spring/assets/28051638/fb057e4d-4dee-4722-be48-a2a53b97c4be">
+
+- 파일업로드 하면 문자(데이터), 파일(바이너리)가 전송됩니다. 
+
+
+
+
