@@ -3193,4 +3193,4 @@ public class FormatterController {
 - @NumberFormat : 숫자 관련 형식 지정 포맷터 사용
 - @DateTimeFormat : 날짜 관련 형식 지정 포맷터 사용
 
-> 정리 : 직접 용도에 맞게 Converter 인터페이스를 구현하여 타입 컨버터를 만들고,  ConversionService에 등록해서 범용 타입 변환으로 적용할 수 있으며, 객체를 특정 포맷으로 변환하기 위해 스프링이 기본으로 제공하는  Fomatter 애노테이션을 통해 Date, Number 포맷을 특화된 기능으로 사용할 수 있습니다.
+> 정리 : 직접 용도에 맞게 Converter 인터페이스를 구현하여 타입 컨버터를 만들고,  ConversionService에 등록해서 범용 타입 변환으로 적용할 수 있으며, 객체의 필드를 특정 포맷으로 변환하기 위해 스프링이 기본으로 제공하는 Fomatter 애노테이션을 통해 Date, Number 포맷을 적용하여 특화된 기능으로 사용할 수 있습니다.
