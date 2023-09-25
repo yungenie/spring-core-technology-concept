@@ -888,11 +888,11 @@ public interface HttpMessageConverter<T> {
 2 = MappingJackson2HttpMessageConverter
 
 - ByteArrayHttpMessageConverter : byte[] 데이터를 처리한다.
-	- 클래스 타입: byte[] , 미디어타입: */* , 
+	- 클래스 타입: byte[] , 미디어타입: &#42;/&#42; , 
 	- 요청 예) @RequestBody byte[] data 
 	- 응답 예) @ResponseBody return byte[] 쓰기 미디어타입 application/octet-stream 
 - StringHttpMessageConverter : String 문자로 데이터를 처리한다. 
-	- 클래스 타입: String , 미디어타입: */* 
+	- 클래스 타입: String , 미디어타입: &#42;/&#42;
 	- 요청 예) @RequestBody String data 
 	- 응답 예) @ResponseBody return "ok" 쓰기 미디어타입 text/plain 
 - MappingJackson2HttpMessageConverter : application/json 
@@ -908,7 +908,7 @@ public interface HttpMessageConverter<T> {
 	- 대상 클래스 타입을 지원하는 지?   
 	  예) @RequestBody 의 대상 클래스 ( byte[] , String , HelloData )    
 	- ```HTTP 요청의 Content-Type``` 미디어 타입을 지원하는 지?   
-  	  예) text/plain , application/json , */*   
+  	  예) text/plain , application/json , &#42;/&#42;   
 
 
 #### HTTP 응답 데이터 생성
@@ -919,7 +919,7 @@ public interface HttpMessageConverter<T> {
 	- 대상 클래스 타입을 지원하는 지?    
 	  예) return의 대상 클래스 ( byte[] , String , HelloData )
 	- ```HTTP 요청의 Accept```미디어 타입을 지원하는가.(더 정확히는
-	  예) text/plain , application/json , */*
+	  예) text/plain , application/json , &#42;/&#42;
 
 
 #### HTTP 메시지 컨버터 위치
