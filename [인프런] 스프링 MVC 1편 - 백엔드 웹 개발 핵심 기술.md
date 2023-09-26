@@ -894,7 +894,10 @@ public interface HttpMessageConverter<T> {
 #### 스프링 부트 기본 HTTP 메시지 컨버터 동작 및 종류
 - HttpMessageConverter 인터페이스에서 `대상 클래스 타입`(Class<?>)과 `미디어 타입`(MediaType)을 체크해서 사용여부를 결정하고,
 - 아래 순서로 만족하지 않으면 다음 메시지 컨버터로 우선순위가 넘어갑니다.
-- 주요 메시지 컨버터  
+- 요청의 경우는 메소드의 파라미터 클래스 타입과 HTTP 요청 헤더의 Content-Type를 통해 선택 
+- 응답의 경우는 메소드의 리턴 클래스 타입과 HTTP 요청 헤더의 Accept-Type을 통해 선택 
+  
+#### 주요 메시지 컨버터  
 	```
 	0 = ByteArrayHttpMessageConverter  
 	1 = StringHttpMessageConverter  
@@ -932,7 +935,7 @@ public interface HttpMessageConverter<T> {
 - canWrite() 조건 : 
 	- 대상 클래스 타입을 지원하는 지?    
 	  예) return의 대상 클래스 ( byte[] , String , HelloData )
-	- ```HTTP 요청의 Accept```미디어 타입을 지원하는가? 
+	- ```HTTP 요청의 Accept-Type```미디어 타입을 지원하는가? 
 	  예) text/plain , application/json , &#42;/&#42;
 
 ### 요청 매핑 핸들러 어댑터 구조
