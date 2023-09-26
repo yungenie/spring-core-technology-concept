@@ -12,7 +12,7 @@
   - 핸들러 매핑과 핸들러 어댑터 
 - [스프링 MVC 기본기능](#스프링-mvc-기본기능)
   - [HTTP 메시지 컨버터](#HTTP-메시지-컨버터)
-  - [요청 및 응답 매핑 핸들러 어댑터 구조](#요청-및-응답-매핑-핸들러-어댑터-구조)
+  - [요청 매핑 핸들러 어댑터 구조](#요청-매핑-핸들러-어댑터-구조)
 - [웹 페이지 만들기](#웹-페이지-만들기)
 
 <br>
@@ -827,15 +827,18 @@ public class ControllerTest {
 - json변환해서 나갑니다.
 
 ## HTTP 메시지 컨버터
-- @ResponseBody를 사용해서 ```HTTP Body```에 문자 내용을 직접 반환할 때 viewResolver 대신에 HttpMessageConverter가 동작합니다.
+- HTTP 메시지 컨버터는 HTTP 요청, HTTP 응답 둘다 사용된다.
+- HTTP 요청 : @RequestBody, HttpEntity(RequestEntity)
+- HTTP 응답 : @ResponseBody, HttpEntity(ResponseEntity)
+- 예를들어, @ResponseBody를 사용해서 ```HTTP Body```에 문자 내용을 직접 반환할 때 viewResolver 대신에 HttpMessageConverter가 동작합니다.
 - 기본 문자 처리 : StringHttpMessageConverter
 - 기본 객체 처리 : MappingJackson2HttpMessageConverter
 - 클라이언트의 HTTP Accecpt 해더와 서버의 컨트롤러 반환타입 정보를 조합해서 HttpMessageConverter가 선택됩니다.
 
 #### HTTP 메시지 컨버터 인터페이스
 - 스프링 부트는 다양항 메시지 컨버터를 제공합니다. 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정합니다.
-- canRead(), canWrite() : class와 mediaType을 지원하는 지 체크하는 메소드
-- read(), write() : message 읽고 쓰는 메소드
+- `canRead()`, `canWrite()` : 메시지 컨버터가 해당 class와 mediaType을 지원하는지 체크
+- `read()`, `write()` : 메시지 컨버터를 통message 읽고 쓰는 메소드
 
 ```java
 /**
@@ -884,7 +887,7 @@ public interface HttpMessageConverter<T> {
 }
 ```
 
-#### 스프링 부트 기본 HTTP 메시지 컨버터
+#### 스프링 부트 기본 HTTP 메시지 컨버터 종류
 - HttpMessageConverter 인터페이스에서 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정하고,
 - 아래 순서로 만족하지 않으면 다음 메시지 컨버터로 우선순위가 넘어갑니다.
 - 주요 메시지 컨버터  
@@ -932,18 +935,7 @@ public interface HttpMessageConverter<T> {
 #### HTTP 메시지 컨버터 위치
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232447149-126b636e-ef8b-4416-9769-5a852a105a74.png">
 
-- 요청의 경우 
-	- @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있다.  
- 	- ArgumentResolver들이 HTTP 메시지 컨버터를 사용해서 요청 데이터를 (필요한 값/객체) 생성한다.  
-- 응답의 경우  
-	- @ResponseBody와 HttpEntity를 처리하는 ReturnValueHandler가 있다.  
- 	- ReturnValueHandler가 HTTP 메시지 컨버터를 호출해서 응답 결과를 만든다.  
-- 정리하면 
-	- 스프링 MVC는 @RequestBody, @ResponseBody가 있으면 RequestResponseBodyMethodProcessor (ArgumentResolver) 호출 
-	- HttpEntity가 있으면 HttpEntityMethodProcessor (ArgumentResolver)를 사용한다.  
-
-
-### 요청 및 응답 매핑 핸들러 어댑터 구조
+### 요청 매핑 핸들러 어댑터 구조
 - Spring MVC 구조
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443524-74b40fb0-2bf2-48b5-aa3d-095902c5181a.png">
 
@@ -965,8 +957,20 @@ public interface HttpMessageConverter<T> {
 - 스프링은 10여개가 넘는 ReturnValueHandler 를 지원한다. 예) ModelAndView , @ResponseBody , HttpEntity , String
 
 #### ReturnValueHandler -> HTTP 메시지 컨버터(응답)
-- @ResponseBody와 HttpEntity를 처리하는 ReturnValueHandler가 있습니다. HTTP 메시지 컨버터를 호출해서 ```응답 결과```를 만듭니다.
+- @ResponseBody와 HttpEntity를 처리하는 HandlerMethodReturnValueHandler를 줄여서 부르는 ReturnValueHandler가 있습니다. HTTP 메시지 컨버터를 호출해서 ```응답 결과```를 만듭니다.
 
+#### 정리
+- 요청의 경우 
+	- @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있다.  
+ 	- ArgumentResolver들이 HTTP 메시지 컨버터를 사용해서 요청 데이터를 (필요한 값/객체) 생성한다.  
+- 응답의 경우  
+	- @ResponseBody와 HttpEntity를 처리하는 ReturnValueHandler가 있다.  
+ 	- ReturnValueHandler가 HTTP 메시지 컨버터를 호출해서 응답 결과를 만든다.  
+- 정리하면 
+	- 스프링 MVC는 @RequestBody, @ResponseBody가 있으면 RequestResponseBodyMethodProcessor (ArgumentResolver) 호출 
+	- HttpEntity가 있으면 HttpEntityMethodProcessor (ArgumentResolver)를 사용한다.
+
+</br>
 
 ## 웹 페이지 만들기
 - IntelliJ 기본 설정 
