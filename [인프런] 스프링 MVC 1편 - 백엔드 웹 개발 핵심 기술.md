@@ -844,7 +844,6 @@ public class ControllerTest {
 - 스프링 부트는 다양항 메시지 컨버터를 제공합니다. 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정합니다.
 - `canRead()`, `canWrite()` : 메시지 컨버터가 해당 class와 mediaType을 지원하는지 체크
 - `read()`, `write()` : 메시지 컨버터를 통message 읽고 쓰는 메소드
-
 ```java
 /**
  * Strategy interface for converting from and to HTTP requests and responses.
@@ -942,7 +941,7 @@ public interface HttpMessageConverter<T> {
 #### Spring MVC 구조
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443524-74b40fb0-2bf2-48b5-aa3d-095902c5181a.png">
 
-- 핸들러 어댑터인 (RequestMappingHandlerAdapter)에서 핸들러(컨트롤러) 사이에 HTTP 메시지 컨버터가 동작한다. 
+- 핸들러 어댑터(RequestMappingHandlerAdapter)에서 핸들러(컨트롤러) 사이에 HTTP 메시지 컨버터가 동작한다. (위 그림 4번 과정에 해당) 
 
 ##### RequestMappingHandlerAdapter 동작방식
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443620-0d615fec-3aaa-45cb-9b16-48a4d632e9b1.png">
