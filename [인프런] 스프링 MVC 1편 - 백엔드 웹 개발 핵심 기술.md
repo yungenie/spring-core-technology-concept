@@ -943,7 +943,7 @@ public interface HttpMessageConverter<T> {
 
 - 핸들러 어댑터(RequestMappingHandlerAdapter)에서 핸들러(컨트롤러) 사이에 HTTP 메시지 컨버터가 동작한다. (위 그림 4번 과정에 해당) 
 
-##### RequestMappingHandlerAdapter 동작방식
+#### RequestMappingHandlerAdapter 동작방식
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443620-0d615fec-3aaa-45cb-9b16-48a4d632e9b1.png">
 
 #### ArgumentResolver (요청처리)
@@ -975,6 +975,7 @@ public interface HttpMessageConverter<T> {
 	- HttpEntity가 있으면 HttpEntityMethodProcessor (ArgumentResolver)를 사용한다.
 
 </br>
+
 
 ## 웹 페이지 만들기
 - IntelliJ 기본 설정 
