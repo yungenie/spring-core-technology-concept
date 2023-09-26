@@ -927,15 +927,16 @@ public interface HttpMessageConverter<T> {
 
 #### HTTP 메시지 컨버터 위치
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232447149-126b636e-ef8b-4416-9769-5a852a105a74.png">
-- 요청의 경우
-	- @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있다. 
- 	- ArgumentResolver들이 HTTP 메시지 컨버터를 사용해서 요청 데이터를 (필요한 값/객체) 생성한다. 
-- 응답의 경우 
-	- @ResponseBody와 HttpEntity를 처리하는 ReturnValueHandler가 있다. 
- 	- ReturnValueHandler가 HTTP 메시지 컨버터를 호출해서 응답 결과를 만든다. 
-- 정리하면
-	- 스프링 MVC는 @RequestBody, @ResponseBody가 있으면 RequestResponseBodyMethodProcessor (ArgumentResolver) 호출
-	- HttpEntity가 있으면 HttpEntityMethodProcessor (ArgumentResolver)를 사용한다. 
+
+- 요청의 경우 
+	- @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있다.  
+ 	- ArgumentResolver들이 HTTP 메시지 컨버터를 사용해서 요청 데이터를 (필요한 값/객체) 생성한다.  
+- 응답의 경우  
+	- @ResponseBody와 HttpEntity를 처리하는 ReturnValueHandler가 있다.  
+ 	- ReturnValueHandler가 HTTP 메시지 컨버터를 호출해서 응답 결과를 만든다.  
+- 정리하면 
+	- 스프링 MVC는 @RequestBody, @ResponseBody가 있으면 RequestResponseBodyMethodProcessor (ArgumentResolver) 호출 
+	- HttpEntity가 있으면 HttpEntityMethodProcessor (ArgumentResolver)를 사용한다.  
 
 
 ### 요청 매핑 핸들러 어댑터 구조
