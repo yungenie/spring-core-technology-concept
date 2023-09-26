@@ -843,7 +843,7 @@ public class ControllerTest {
 #### HTTP 메시지 컨버터 인터페이스
 - 스프링 부트는 다양항 메시지 컨버터를 제공합니다. 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정합니다.
 - `canRead()`, `canWrite()` : 메시지 컨버터가 해당 class와 mediaType을 지원하는지 체크
-- `read()`, `write()` : 메시지 컨버터를 통message 읽고 쓰는 메소드
+- `read()`, `write()` : 메시지 컨버터를 통해 message 읽고 쓰는 메소드
 ```java
 /**
  * Strategy interface for converting from and to HTTP requests and responses.
@@ -952,7 +952,9 @@ public interface HttpMessageConverter<T> {
 #### ArgumentResolver (요청처리)
 - 애노테이션 기반의 컨트롤러는 매우 다양한 파라미터를 사용할 수 있었다.
 - HttpServletRequest, Model, @RequestParam , @ModelAttribute, @RequestBody, HttpEntity 같은 HTTP 메시지를 처리하는 부분까지 파라미터를 유연하게 처리할 수 있는 이유가 바로 ArgumentResolver 덕분이다.
-- ```동작원리``` : 애노테이션 기반 컨트롤러를 처리하는 RequestMappingHandlerAdapter가 HandlerMethodArgumentResolver 호출해서 컨트롤러(핸들러)가 필요로 하는 **다양한 파라미터의 값(객체)를 생성**합니다. 그 후 컨트롤러를 호출하면서 값을 넘겨줍니다.  
+
+#### ArgumentResolver 동작원리
+- 애노테이션 기반 컨트롤러를 처리하는 RequestMappingHandlerAdapter -> HandlerMethodArgumentResolver -> supportsParameter() 호출해서 해당 파라미터 지원하는 지 체크하고, resolveArgument()호출해서 컨트롤러(핸들러)가 필요로 하는 **다양한 파라미터의 값(객체)를 생성**합니다. 그 후 컨트롤러를 호출하면서 값을 넘겨줍니다.  
 
 #### ArgumentResolver -> HTTP 메시지 컨버터(요청)
 - @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있습니다.
