@@ -943,7 +943,7 @@ public interface HttpMessageConverter<T> {
 	- HttpEntity가 있으면 HttpEntityMethodProcessor (ArgumentResolver)를 사용한다.  
 
 
-### 요청 매핑 핸들러 어댑터 구조
+### 요청 및 응답 매핑 핸들러 어댑터 구조
 - Spring MVC 구조
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443524-74b40fb0-2bf2-48b5-aa3d-095902c5181a.png">
 
