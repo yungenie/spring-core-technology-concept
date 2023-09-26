@@ -174,7 +174,7 @@
 - prefix: /WEB-INF/views/
 - suffix: .jsp
 
-## 스프링 MVC 구조 이해
+## 스프링 MVC 전체 구조 
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/230334437-977978fb-c4f5-493c-8873-cf154815a727.png">
 
 #### 주요 인터페이스 목록
@@ -826,7 +826,7 @@ public class ControllerTest {
 #### @Controller & @ResponseBody & return VO
 - json변환해서 나갑니다.
 
-### HTTP 메시지 컨버터
+## HTTP 메시지 컨버터
 - @ResponseBody를 사용해서 ```HTTP Body```에 문자 내용을 직접 반환할 때 viewResolver 대신에 HttpMessageConverter가 동작합니다.
 - 기본 문자 처리 : StringHttpMessageConverter
 - 기본 객체 처리 : MappingJackson2HttpMessageConverter
