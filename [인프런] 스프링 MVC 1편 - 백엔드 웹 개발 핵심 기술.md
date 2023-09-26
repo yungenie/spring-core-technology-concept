@@ -891,8 +891,8 @@ public interface HttpMessageConverter<T> {
 }
 ```
 
-#### 스프링 부트 기본 HTTP 메시지 컨버터 종류
-- HttpMessageConverter 인터페이스에서 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정하고,
+#### 스프링 부트 기본 HTTP 메시지 컨버터 동작 및 종류
+- HttpMessageConverter 인터페이스에서 `대상 클래스 타입`(Class<?>)과 `미디어 타입`(MediaType)을 체크해서 사용여부를 결정하고,
 - 아래 순서로 만족하지 않으면 다음 메시지 컨버터로 우선순위가 넘어갑니다.
 - 주요 메시지 컨버터  
 	```
