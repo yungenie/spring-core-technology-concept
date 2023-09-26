@@ -826,14 +826,19 @@ public class ControllerTest {
 #### @Controller & @ResponseBody & return VO
 - json변환해서 나갑니다.
 
+</br>
+
 ## HTTP 메시지 컨버터
+<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232447149-126b636e-ef8b-4416-9769-5a852a105a74.png">
+
 - HTTP 메시지 컨버터는 HTTP 요청, HTTP 응답 둘다 사용된다.
 - HTTP 요청 : @RequestBody, HttpEntity(RequestEntity)
 - HTTP 응답 : @ResponseBody, HttpEntity(ResponseEntity)
-- 예를들어, @ResponseBody를 사용해서 ```HTTP Body```에 문자 내용을 직접 반환할 때 viewResolver 대신에 HttpMessageConverter가 동작합니다.
-- 기본 문자 처리 : StringHttpMessageConverter
-- 기본 객체 처리 : MappingJackson2HttpMessageConverter
 - 클라이언트의 HTTP Accecpt 해더와 서버의 컨트롤러 반환타입 정보를 조합해서 HttpMessageConverter가 선택됩니다.
+	- 기본 문자 처리 : StringHttpMessageConverter
+	- 기본 객체 처리 : MappingJackson2HttpMessageConverter
+- 예를들어, @ResponseBody를 사용해서 ```HTTP Body```에 문자 내용을 직접 반환할 때 viewResolver 대신에 HttpMessageConverter가 동작합니다.
+
 
 #### HTTP 메시지 컨버터 인터페이스
 - 스프링 부트는 다양항 메시지 컨버터를 제공합니다. 대상 클래스 타입(Class<?>)과 미디어 타입(MediaType)을 체크해서 사용여부를 결정합니다.
@@ -917,7 +922,7 @@ public interface HttpMessageConverter<T> {
 - canRead() 조건 :
 	- 대상 클래스 타입을 지원하는 지?   
 	  예) @RequestBody 의 대상 클래스 ( byte[] , String , HelloData )    
-	- ```HTTP 요청의 Content-Type``` 미디어 타입을 지원하는 지?   
+	- ```HTTP 요청의 Content-Type``` 미디어 타입을 지원하는지?   
   	  예) text/plain , application/json , &#42;/&#42;   
 
 
@@ -928,24 +933,24 @@ public interface HttpMessageConverter<T> {
 - canWrite() 조건 : 
 	- 대상 클래스 타입을 지원하는 지?    
 	  예) return의 대상 클래스 ( byte[] , String , HelloData )
-	- ```HTTP 요청의 Accept```미디어 타입을 지원하는가.(더 정확히는
+	- ```HTTP 요청의 Accept```미디어 타입을 지원하는가? 
 	  예) text/plain , application/json , &#42;/&#42;
 
-
-#### HTTP 메시지 컨버터 위치
-<img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232447149-126b636e-ef8b-4416-9769-5a852a105a74.png">
-
 ### 요청 매핑 핸들러 어댑터 구조
-- Spring MVC 구조
+
+#### HTTP 메시지 컨버터는 스프링 MVC 어디쯤에서 사용되는 것일까?
+#### Spring MVC 구조
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443524-74b40fb0-2bf2-48b5-aa3d-095902c5181a.png">
 
-- RequestMappingHandlerAdapter 동작방식
+- 핸들러 어댑터인 (RequestMappingHandlerAdapter)에서 핸들러(컨트롤러) 사이에 HTTP 메시지 컨버터가 동작한다. 
+
+##### RequestMappingHandlerAdapter 동작방식
 <img width="100%" alt="image" src="https://user-images.githubusercontent.com/28051638/232443620-0d615fec-3aaa-45cb-9b16-48a4d632e9b1.png">
 
 #### ArgumentResolver (요청처리)
 - 애노테이션 기반의 컨트롤러는 매우 다양한 파라미터를 사용할 수 있었다.
 - HttpServletRequest, Model, @RequestParam , @ModelAttribute, @RequestBody, HttpEntity 같은 HTTP 메시지를 처리하는 부분까지 파라미터를 유연하게 처리할 수 있는 이유가 바로 ArgumentResolver 덕분이다.
-- ```동작원리``` : 애노테이션 기반 컨트롤러를 처리하는 RequestMappingHandlerAdapter가 ArgumentResolver 호출해서 컨트롤러(핸들러)가 필요로 하는 **다양한 파라미터의 값(객체)를 생성**합니다. 그 후 컨트롤러를 호출하면서 값을 넘겨줍니다.  
+- ```동작원리``` : 애노테이션 기반 컨트롤러를 처리하는 RequestMappingHandlerAdapter가 HandlerMethodArgumentResolver 호출해서 컨트롤러(핸들러)가 필요로 하는 **다양한 파라미터의 값(객체)를 생성**합니다. 그 후 컨트롤러를 호출하면서 값을 넘겨줍니다.  
 
 #### ArgumentResolver -> HTTP 메시지 컨버터(요청)
 - @RequestBody를 처리하는 ArgumentResolver가 있고, HttpEntity를 처리하는 ArgumentResolver가 있습니다.
